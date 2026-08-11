@@ -320,6 +320,12 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .info-item-value{font-size:14px;color:var(--gray-900);font-weight:500;}
 .profile-cols{display:grid;grid-template-columns:1fr 1.15fr;gap:20px;align-items:start;margin-top:20px;}
 .calendar-full-section{width:100%;margin-top:20px;}
+.calendar-member-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:8px 0 20px;padding:4px 0;flex-wrap:wrap;}
+.calendar-member-info{display:flex;align-items:center;gap:14px;min-width:0;}
+.calendar-member-meta{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;}
+.calendar-member-meta .num{font-size:12px;color:var(--gray-500);font-family:var(--font-mono);}
+.calendar-member-bar .btn{flex-shrink:0;}
+.member-details-card{margin-top:4px;}
 .member-profile-section{width:100%;margin-top:20px;scroll-margin-top:90px;}
 .member-profile-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
 .member-info-grid{grid-template-columns:repeat(3,1fr);gap:22px 30px;}
@@ -572,6 +578,10 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   tbody td{border-bottom:none;padding:5px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   tbody td::before{content:attr(data-label);font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;}
   .profile-header{flex-direction:column;align-items:flex-start;}
+  .calendar-member-bar{align-items:stretch;}
+  .calendar-member-info{width:100%;}
+  .calendar-member-bar > .btn{width:100%;}
+  .calendar-member-bar .page-title{font-size:19px;}
   .profile-header-actions{width:100%;}
   .profile-header-actions .btn{flex:1;}
   .action-buttons{grid-template-columns:1fr;}
@@ -925,12 +935,12 @@ function renderChrome(){
   Object.keys(NAV_LABELS).forEach(key=>{
     const btn=nav.querySelector(`[data-nav="${key}"]`);
     btn.innerHTML=`${icon(NAV_LABELS[key].icon,18)}<span>${NAV_LABELS[key].label}</span>`;
-    btn.classList.toggle('active', state.route===key || (key==='members' && (state.route==='member-profile'||state.route==='add-member')));
+    btn.classList.toggle('active', state.route===key || (key==='members' && (state.route==='member-profile'||state.route==='member-details'||state.route==='add-member')));
   });
   document.getElementById('sidebar-user-slot').innerHTML=`${avatar('Limol Admin',36)}<div><div class="sidebar-user-name">Limol Admin</div><div class="sidebar-user-role">Administrator</div></div>`;
   document.getElementById('logout-btn').innerHTML=`${icon('logout',16)}<span>Log out</span>`;
   document.getElementById('hamburger-btn').innerHTML=icon('menu',20);
-  document.getElementById('topbar-title').textContent = NAV_LABELS[state.route]?.label || (state.route==='member-profile' ? 'Member Profile' : state.route==='add-member' ? 'Register Member' : "Limol's Microfinance");
+  document.getElementById('topbar-title').textContent = NAV_LABELS[state.route]?.label || (state.route==='member-details' ? 'Member Profile' : state.route==='member-profile' ? 'Savings Calendar' : state.route==='add-member' ? 'Register Member' : "Limol's Microfinance");
   const bell=document.getElementById('notif-bell-btn');
   const flagged=flaggedMembers();
   bell.innerHTML=icon('bell',18)+(flagged.length?`<span class="notif-dot">${flagged.length}</span>`:'');
@@ -1221,6 +1231,37 @@ function pageMemberProfile(id){
   if(!m) return emptyState('users','Member not found','This member may have been removed.','members','Back to Members');
   return `
   <a class="back-link" data-nav="members">${icon('chevLeft',15)} Back to Members</a>
+
+  <div class="calendar-member-bar">
+    <div class="calendar-member-info">
+      ${avatar(m.name,52,'member-photo')}
+      <div>
+        <div class="eyebrow">Savings Calendar</div>
+        <h1 class="page-title">${m.name}</h1>
+        <div class="calendar-member-meta">
+          <span class="num">${m.cardNumber}</span>
+          <span class="badge badge-green">${icon('checkCircle',12)} ${m.status}</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" id="member-profile-jump">${icon('users',15)} Member Profile</button>
+  </div>
+
+  <div class="calendar-full-section card card-pad" id="calendar-card">
+    ${renderCalendarCard(m)}
+  </div>
+  `;
+}
+
+/* =========================================================================
+   PAGE: MEMBER PROFILE DETAILS
+   ========================================================================= */
+function pageMemberDetails(id){
+  const m=getMember(id);
+  if(!m) return emptyState('users','Member not found','This member may have been removed.','members','Back to Members');
+  return `
+  <a class="back-link" data-nav="members">${icon('chevLeft',15)} Back to Members</a>
+
   <div class="profile-header">
     ${avatar(m.name,72,'member-photo')}
     <div class="profile-header-info">
@@ -1232,7 +1273,7 @@ function pageMemberProfile(id){
       </div>
     </div>
     <div class="profile-header-actions">
-      <button class="btn btn-secondary" id="member-profile-jump">${icon('users',15)} Member Profile</button>
+      <button class="btn btn-secondary" id="member-details-calendar">${icon('calCheck',15)} Savings Calendar</button>
       <button class="btn btn-secondary" id="edit-member-btn">${icon('edit',15)} Edit Member</button>
       <button class="btn btn-warning" id="withdraw-btn" data-member="${m.id}">${icon('minusCircle',15)} Withdraw Funds</button>
     </div>
@@ -1249,18 +1290,13 @@ function pageMemberProfile(id){
     <div class="summary-card"><div class="eyebrow">Days Missed</div><div class="val" style="color:${m.daysMissed>0?'var(--red-700)':'var(--gray-900)'};">${m.daysMissed}</div></div>
   </div>
 
-  <div class="calendar-full-section card card-pad" id="calendar-card">
-    ${renderCalendarCard(m)}
-  </div>
-
-  <div class="member-profile-section card card-pad" id="member-profile-section">
+  <div class="member-profile-section card card-pad member-details-card">
     <div class="member-profile-section-head">
       <div>
         <div class="eyebrow">Member Details</div>
-        <h3 class="section-title" style="margin-top:4px;">Member Profile</h3>
+        <h3 class="section-title" style="margin-top:4px;">Personal & Savings Information</h3>
         <div class="page-subtitle">Complete information for ${m.name}.</div>
       </div>
-      <button class="btn btn-secondary btn-sm" id="member-profile-top">${icon('calCheck',14)} Back to Calendar</button>
     </div>
     <div class="info-grid member-info-grid">
       <div><div class="info-item-label">Full Name</div><div class="info-item-value">${m.name}</div></div>
@@ -1908,6 +1944,7 @@ function render(){
     case 'members': html=pageMembers(); break;
     case 'add-member': html=pageAddMember(); break;
     case 'member-profile': html=pageMemberProfile(state.selectedMemberId); break;
+    case 'member-details': html=pageMemberDetails(state.selectedMemberId); break;
     case 'today': html=pageToday(); break;
     case 'reports': html=pageReports(); break;
     case 'notifications-page': html=pageNotificationsFull(); break;
@@ -2026,15 +2063,13 @@ document.addEventListener('click',function(e){
   const repChip=e.target.closest('[data-report-range]');
   if(repChip){ state.reportRange=repChip.getAttribute('data-report-range'); render(); return; }
 
-  // member profile section navigation
+  // member profile page navigation
   if(e.target.closest('#member-profile-jump')){
-    const section=document.getElementById('member-profile-section');
-    if(section) section.scrollIntoView({behavior:'smooth',block:'start'});
+    go('member-details',{selectedMemberId:state.selectedMemberId});
     return;
   }
-  if(e.target.closest('#member-profile-top')){
-    const calendar=document.getElementById('calendar-card');
-    if(calendar) calendar.scrollIntoView({behavior:'smooth',block:'start'});
+  if(e.target.closest('#member-details-calendar')){
+    go('member-profile',{selectedMemberId:state.selectedMemberId});
     return;
   }
 
