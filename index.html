@@ -497,7 +497,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .remember-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-600);font-weight:500;}
 .checkbox-row input{width:15px;height:15px;accent-color:var(--navy-900);}
-.forgot-link{font-size:13px;color:var(--blue-500);font-weight:600;}
+.forgot-link{font-size:13px;color:var(--blue-500);font-weight:600;background:none;border:none;cursor:pointer;}
 .login-security-note{display:flex;align-items:center;gap:7px;justify-content:center;margin-top:26px;font-size:12px;color:var(--gray-400);}
 
 /* ============ RESPONSIVE ============ */
@@ -604,7 +604,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
         </div>
         <div class="remember-row">
           <label class="checkbox-row"><input type="checkbox" checked/> Remember me</label>
-          <a class="forgot-link" href="#">Forgot password?</a>
+          <button type="button" class="forgot-link" id="forgot-password-link">Forgot password?</button>
         </div>
         <button type="submit" class="btn btn-primary btn-block" style="padding:12px;">Sign In</button>
       </form>
@@ -731,7 +731,8 @@ const ICONS = {
   minusCircle:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
   arrowDownCircle:'<circle cx="12" cy="12" r="9"/><path d="M12 7v8"/><path d="m8.5 12 3.5 3.5L15.5 12"/>',
   user:'<circle cx="12" cy="8" r="3.5"/><path d="M5.5 21v-2.5a4.5 4.5 0 0 1 4.5-4.5h4a4.5 4.5 0 0 1 4.5 4.5V21"/>',
-  settings:'<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>'
+  settings:'<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
+  trash:'<path d="M4 7h16"/><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/><path d="M6 7l1 13a2 2 0 0 0 2 1.8h6a2 2 0 0 0 2-1.8l1-13"/><path d="M10 11v6M14 11v6"/>'
 };
 function icon(name,size=18,strokeWidth=2){
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
@@ -1213,6 +1214,7 @@ function pageMemberProfile(id){
     <div class="profile-header-actions">
       <button class="btn btn-secondary" id="edit-member-btn">${icon('edit',15)} Edit Member</button>
       <button class="btn btn-warning" id="withdraw-btn" data-member="${m.id}">${icon('minusCircle',15)} Withdraw Funds</button>
+      <button class="btn btn-danger-outline" id="delete-member-btn" data-member="${m.id}">${icon('trash',15)} Delete Member</button>
     </div>
   </div>
 
@@ -1622,9 +1624,18 @@ function openProfileModal(){
 }
 
 function openSettingsModal(){
+  const currentName = getCurrentUserName();
   openModal(`
     <div class="modal-head"><h3>⚙️ Settings</h3><button class="modal-close" id="modal-close-btn">${icon('x',15)}</button></div>
     <div class="modal-body">
+      <div style="margin-bottom:20px;">
+        <h4 style="font-size:14px;margin-bottom:12px;">Display Name</h4>
+        <div class="field">
+          <label>Name shown in greetings &amp; sidebar</label>
+          <input type="text" id="settings-display-name" value="${currentName}" placeholder="e.g. Limol Admin"/>
+        </div>
+        <div class="error-msg hidden" id="name-error">${icon('alertTri',12)} <span id="name-error-text"></span></div>
+      </div>
       <div style="margin-bottom:20px;">
         <h4 style="font-size:14px;margin-bottom:12px;">Change Password</h4>
         <div class="field">
@@ -1659,46 +1670,167 @@ function openSettingsModal(){
   
   // Add settings save handler
   document.getElementById('settings-save-btn')?.addEventListener('click', async function(){
+    const nameInput = document.getElementById('settings-display-name');
+    const newName = nameInput.value.trim();
+    const nameErrorEl = document.getElementById('name-error');
+    const nameErrorText = document.getElementById('name-error-text');
     const currentPw = document.getElementById('settings-current-pw').value;
     const newPw = document.getElementById('settings-new-pw').value;
     const confirmPw = document.getElementById('settings-confirm-pw').value;
     const errorEl = document.getElementById('settings-error');
     const errorText = document.getElementById('settings-error-text');
-    
-    if(!currentPw || !newPw || !confirmPw){
-      errorEl.classList.remove('hidden');
-      errorText.textContent = 'All password fields are required.';
-      return;
-    }
-    if(newPw.length < 6){
-      errorEl.classList.remove('hidden');
-      errorText.textContent = 'New password must be at least 6 characters.';
-      return;
-    }
-    if(newPw !== confirmPw){
-      errorEl.classList.remove('hidden');
-      errorText.textContent = 'Passwords do not match.';
-      return;
-    }
-    
+
+    nameErrorEl.classList.add('hidden');
     errorEl.classList.add('hidden');
+
+    if(!newName){
+      nameErrorEl.classList.remove('hidden');
+      nameErrorText.textContent = 'Display name cannot be empty.';
+      return;
+    }
+
+    const wantsPasswordChange = currentPw || newPw || confirmPw;
+    if(wantsPasswordChange){
+      if(!currentPw || !newPw || !confirmPw){
+        errorEl.classList.remove('hidden');
+        errorText.textContent = 'All password fields are required to change your password.';
+        return;
+      }
+      if(newPw.length < 6){
+        errorEl.classList.remove('hidden');
+        errorText.textContent = 'New password must be at least 6 characters.';
+        return;
+      }
+      if(newPw !== confirmPw){
+        errorEl.classList.remove('hidden');
+        errorText.textContent = 'Passwords do not match.';
+        return;
+      }
+    }
+
     this.disabled = true;
-    this.textContent = 'Updating...';
-    
-    const { error } = await supabaseClient.auth.updateUser({ password: newPw });
-    
+    this.textContent = 'Saving...';
+
+    // Update name (and password if provided) in one call where possible
+    const updatePayload = { data: { name: newName } };
+    if(wantsPasswordChange) updatePayload.password = newPw;
+
+    const { data, error } = await supabaseClient.auth.updateUser(updatePayload);
+
     this.disabled = false;
-    this.textContent = 'Save Settings';
-    
+    this.innerHTML = `${icon('checkCircle',15)} Save Settings`;
+
     if(error){
       errorEl.classList.remove('hidden');
-      errorText.textContent = error.message || 'Failed to update password.';
+      errorText.textContent = error.message || 'Failed to update settings.';
       return;
     }
-    
+
+    if(data && data.user) CURRENT_SESSION_USER = data.user;
     closeModal();
-    toast('success','checkCircle','Password updated successfully!');
+    toast('success','checkCircle', wantsPasswordChange ? 'Name and password updated successfully!' : 'Name updated successfully!');
+    render();
   });
+}
+
+function openForgotPasswordModal(){
+  const prefillEmail = document.getElementById('login-email')?.value.trim() || '';
+  openModal(`
+    <div class="modal-head"><h3>Reset Password</h3><button class="modal-close" id="modal-close-btn">${icon('x',15)}</button></div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--gray-500);margin-bottom:16px;">Enter your account email and we'll send you a link to reset your password.</p>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="reset-email" value="${prefillEmail}" placeholder="you@example.com"/>
+      </div>
+      <div class="error-msg hidden" id="reset-error">${icon('alertTri',12)} <span id="reset-error-text"></span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="send-reset-btn">${icon('checkCircle',15)} Send Reset Link</button>
+    </div>
+  `);
+
+  document.getElementById('send-reset-btn')?.addEventListener('click', async function(){
+    const emailInput = document.getElementById('reset-email');
+    const email = emailInput.value.trim();
+    const errorEl = document.getElementById('reset-error');
+    const errorText = document.getElementById('reset-error-text');
+
+    if(!email || !/^\S+@\S+\.\S+$/.test(email)){
+      errorEl.classList.remove('hidden');
+      errorText.textContent = 'Enter a valid email address.';
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = 'Sending...';
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.href
+    });
+
+    this.disabled = false;
+    this.innerHTML = `${icon('checkCircle',15)} Send Reset Link`;
+
+    if(error){
+      errorEl.classList.remove('hidden');
+      errorText.textContent = error.message || 'Could not send reset email.';
+      return;
+    }
+
+    closeModal();
+    toast('success','checkCircle','If an account exists for that email, a reset link has been sent.');
+  });
+}
+
+function openDeleteMemberModal(memberId){
+  const m=getMember(memberId);
+  if(!m) return;
+  openModal(`
+    <div class="modal-head"><h3>Delete Member</h3><button class="modal-close" id="modal-close-btn">${icon('x',15)}</button></div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div class="confirm-icon-wrap" style="background:var(--red-50);color:var(--red-600);">${icon('alertTri',24)}</div>
+        <div>
+          <div style="font-weight:700;font-size:14.5px;margin-bottom:6px;">Delete ${m.name}?</div>
+          <div style="font-size:13.5px;color:var(--gray-500);line-height:1.5;">This permanently removes this member along with all their recorded payments and withdrawals (${GHSshort(m.totalSavings)} balance). This action cannot be undone.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+      <button class="btn btn-warning" style="background:var(--red-600);" id="confirm-delete-member-btn" data-member="${m.id}">${icon('trash',15)} Delete Permanently</button>
+    </div>
+  `);
+}
+
+async function confirmDeleteMember(memberId){
+  const m=getMember(memberId);
+  if(!m) return;
+  const btn=document.getElementById('confirm-delete-member-btn');
+  if(btn){ btn.disabled=true; btn.textContent='Deleting...'; }
+  const [payDel,wDel]=await Promise.all([
+    supabaseClient.from('payments').delete().eq('member_id',m.id),
+    supabaseClient.from('withdrawals').delete().eq('member_id',m.id)
+  ]);
+  if(payDel.error || wDel.error){
+    console.error(payDel.error||wDel.error);
+    toast('error','alertTri',(payDel.error||wDel.error).message||'Could not delete member records.');
+    if(btn){ btn.disabled=false; btn.innerHTML=`${icon('trash',15)} Delete Permanently`; }
+    return;
+  }
+  const {error}=await supabaseClient.from('members').delete().eq('id',m.id);
+  if(error){
+    console.error(error);
+    toast('error','alertTri',error.message||'Could not delete member.');
+    if(btn){ btn.disabled=false; btn.innerHTML=`${icon('trash',15)} Delete Permanently`; }
+    return;
+  }
+  closeModal();
+  await refreshSupabaseData();
+  toast('success','checkCircle',`${m.name} has been deleted.`);
+  go('members');
 }
 
 function openPaymentModal(memberId,dateIso){
@@ -1840,19 +1972,31 @@ function nowTimeStr(){const h=NOW.getHours(),mi='0'+NOW.getMinutes();return `${(
 
 function recomputeMemberDerived(m){
   const joinDaysAgo=Math.round((TODAY-m.dateJoined)/86400000);
-  let totalDeposited=0, daysPaid=0, daysMissed=0;
-  for(let i=0;i<=joinDaysAgo;i++){
-    const iso=isoDate(addDays(TODAY,-i));
+
+  // Count every "paid" entry toward the balance, regardless of date (including
+  // pre-recorded future payments) — the cash was actually handed over.
+  let totalDeposited=0, daysPaid=0;
+  Object.keys(m.payments).forEach(iso=>{
     const pay=m.payments[iso];
     if(pay && pay.status==='paid'){
       totalDeposited+=pay.amount;
       daysPaid++;
-    } else if(pay && pay.status==='skipped'){
-      // skipped days aren't counted as paid or missed
+    }
+  });
+
+  // Missed days can only be evaluated for days that have actually occurred
+  // (join date through today) — a future day can't be "missed" yet.
+  let daysMissed=0;
+  for(let i=0;i<=joinDaysAgo;i++){
+    const iso=isoDate(addDays(TODAY,-i));
+    const pay=m.payments[iso];
+    if(pay && (pay.status==='paid' || pay.status==='skipped')){
+      // paid or skipped days aren't counted as missed
     } else {
       daysMissed++;
     }
   }
+
   let totalWithdrawn=0;
   Object.keys(m.withdrawals).forEach(k=>{totalWithdrawn+=m.withdrawals[k].amount;});
   let lastPaymentDate=null, missStreak=0;
@@ -2023,6 +2167,15 @@ document.addEventListener('click',async function(e){
   if(withdrawBtn){ openWithdrawModal(Number(withdrawBtn.getAttribute('data-member'))); return; }
   const confirmWithdrawBtn=e.target.closest('#confirm-withdraw-btn');
   if(confirmWithdrawBtn){ confirmWithdraw(Number(confirmWithdrawBtn.getAttribute('data-member'))); return; }
+
+  // delete member
+  const deleteMemberBtn=e.target.closest('#delete-member-btn');
+  if(deleteMemberBtn){ openDeleteMemberModal(Number(deleteMemberBtn.getAttribute('data-member'))); return; }
+  const confirmDeleteBtn=e.target.closest('#confirm-delete-member-btn');
+  if(confirmDeleteBtn){ confirmDeleteMember(Number(confirmDeleteBtn.getAttribute('data-member'))); return; }
+
+  // forgot password
+  if(e.target.closest('#forgot-password-link')){ openForgotPasswordModal(); return; }
 
   // modal close/cancel
   if(e.target.closest('#modal-close-btn')||e.target.closest('#modal-cancel-btn')||e.target===document.getElementById('modal-overlay')){ closeModal(); return; }
