@@ -325,43 +325,13 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .cal-nav-btn{width:32px;height:32px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--gray-600);}
 .cal-nav-btn:hover{background:var(--gray-50);}
 .cal-month-label{font-family:var(--font-display);font-weight:700;font-size:15px;}
-.cal-grid{
-  display:grid;
-  grid-template-columns:repeat(7,minmax(0,1fr));
-  gap:6px;
-  width:100%;
-  min-width:0;
-  align-items:stretch;
-}
-.cal-dow{
-  min-width:0;
-  text-align:center;
-  font-size:10.5px;
-  font-weight:700;
-  color:var(--gray-400);
-  text-transform:uppercase;
-  letter-spacing:0.03em;
-  padding:0 2px 4px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-dow{text-align:center;font-size:10.5px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.03em;padding-bottom:4px;}
 .cal-cell{
-  width:100%;
-  min-width:0;
-  aspect-ratio:1 / 1;
-  border-radius:10px;
-  border:1px solid var(--gray-200);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:2px;
-  background:var(--gray-25);
-  cursor:pointer;
-  transition:box-shadow .15s,border-color .15s;
-  position:relative;
+  aspect-ratio:1/0.92;border-radius:10px;border:1px solid var(--gray-200);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:var(--gray-25);cursor:pointer;transition:box-shadow .15s,border-color .15s;position:relative;
   padding:4px 2px;
-  overflow:hidden;
 }
 .cal-cell:hover{box-shadow:var(--shadow-sm);}
 .cal-cell.empty{background:transparent;border:none;cursor:default;}
@@ -374,24 +344,15 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .cal-cell.today{outline:2px solid var(--blue-500);outline-offset:1px;}
 .cal-cell.selectable-mode{cursor:pointer;}
 .cal-cell.selected{outline:2.5px solid var(--blue-500);outline-offset:1px;box-shadow:0 0 0 3px var(--blue-50) inset;}
-.cal-select-check{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:5px;border:1.6px solid var(--gray-300);background:#fff;display:flex;align-items:center;justify-content:center;color:transparent;z-index:2;}
+.cal-select-check{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:5px;border:1.6px solid var(--gray-300);background:#fff;display:flex;align-items:center;justify-content:center;color:transparent;}
 .cal-cell.selected .cal-select-check{background:var(--blue-500);border-color:var(--blue-500);color:#fff;}
-.cal-daynum{
-  font-size:11px;
-  font-weight:700;
-  color:var(--gray-500);
-  position:absolute;
-  top:5px;
-  left:7px;
-  line-height:1;
-  z-index:1;
-}
+.cal-daynum{font-size:11px;font-weight:700;color:var(--gray-500);position:absolute;top:5px;left:7px;}
 .cal-cell.paid .cal-daynum{color:var(--green-700);}
 .cal-cell.missed .cal-daynum{color:var(--red-700);}
 .cal-cell.skipped .cal-daynum{color:var(--gray-500);}
-.cal-status-icon{margin-top:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.cal-status-text{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;margin-top:1px;line-height:1.1;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
-.cal-amount{font-family:var(--font-mono);font-size:10.5px;font-weight:700;margin-top:1px;line-height:1.1;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+.cal-status-icon{margin-top:8px;}
+.cal-status-text{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;margin-top:1px;}
+.cal-amount{font-family:var(--font-mono);font-size:10.5px;font-weight:700;margin-top:1px;}
 .cal-cell.paid .cal-status-text,.cal-cell.paid .cal-amount{color:var(--green-700);}
 .cal-cell.missed .cal-status-text{color:var(--red-700);}
 .cal-cell.skipped .cal-status-text{color:var(--gray-500);}
@@ -552,10 +513,8 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   .cal-grid{gap:3px;}
   .cal-status-text{display:none;}
   .cal-amount{font-size:9px;}
-  .cal-daynum{top:4px;left:5px;}
-  .cal-cell{padding:3px 1px;border-radius:8px;}
-  .cal-status-icon{margin-top:5px;}
-  .cal-select-check{width:14px;height:14px;top:3px;right:3px;border-radius:4px;}
+  .cal-daynum{position:static;margin-bottom:2px;}
+  .cal-cell{padding:4px 1px;}
   .dropdown-panel{right:10px;left:10px;width:auto;top:52px;}
   .modal-overlay{padding:0;align-items:flex-end;}
   .modal-box{width:100%;max-width:100%;border-radius:18px 18px 0 0;max-height:92vh;}
@@ -584,26 +543,6 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   .report-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
   .chart-card{padding:14px;}
 }
-
-@media (max-width: 480px){
-  .cal-head{align-items:flex-start;}
-  .cal-head > div{width:100%;justify-content:space-between;}
-  .cal-month-label{font-size:14px;}
-  .cal-grid{gap:3px;}
-  .cal-dow{font-size:9px;padding-bottom:3px;}
-  .cal-cell{border-radius:7px;}
-  .cal-amount{font-size:8.5px;}
-}
-
-@media (max-width: 360px){
-  .cal-grid{gap:2px;}
-  .cal-cell{border-radius:6px;padding:2px 1px;}
-  .cal-daynum{font-size:10px;top:4px;left:4px;}
-  .cal-status-icon{margin-top:3px;}
-  .cal-amount{font-size:8px;}
-  .cal-select-check{width:13px;height:13px;top:2px;right:2px;}
-}
-
 @media (max-width: 400px){
   .members-grid{grid-template-columns:1fr;}
   .stats-grid{grid-template-columns:1fr;}
@@ -637,7 +576,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
         <div class="field" style="margin-bottom:14px;">
           <label>Password</label>
           <div style="position:relative;">
-            <input type="password" id="login-password" value="••••••••••" required />
+            <input type="password" id="login-password" placeholder="Enter your password" required />
             <button type="button" class="pw-toggle" id="pw-toggle-btn"></button>
           </div>
         </div>
@@ -692,6 +631,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 <div class="modal-overlay hidden" id="modal-overlay"><div class="modal-box" id="modal-box"></div></div>
 <div id="toast-stack"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =========================================================================
    ENOCH'S MICROFINANCE — SPA logic
@@ -789,66 +729,32 @@ const NOW = new Date(); // real current date & time
 const TODAY = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate()); // date-only, midnight, for day comparisons
 
 /* =========================================================================
-   MOCK DATA GENERATION
+   SUPABASE DATA LAYER
    ========================================================================= */
-const FIRST_NAMES=['Kwame','Ama','Kofi','Akosua','Yaw','Efua','Kwabena','Adjoa','Kwaku','Abena','Kojo','Afia','Yaw','Esi','Nana','Adwoa','Fiifi','Akua','Kwesi','Araba','Ebo','Baaba','Kwadwo','Sena','Elikem','Selorm','Mawusi','Nafisa','Ibrahim','Fatima','Yussif','Zainab','Emmanuel','Comfort','Prince','Gifty','Solomon','Rita','Isaac','Linda'];
-const LAST_NAMES=['Mensah','Boateng','Owusu','Asante','Agyeman','Appiah','Osei','Darko','Amoah','Adjei','Frimpong','Antwi','Nkrumah','Gyasi','Ofori','Yeboah','Sarpong','Danquah','Tetteh','Quaye','Addo','Ankrah','Bediako','Kusi'];
-const AREAS=['Adabraka, Accra','Osu, Accra','Madina, Accra','Kaneshie, Accra','Tema Community 5','Ashaiman','Dansoman, Accra','Nungua, Accra','East Legon, Accra','Achimota, Accra','Abeka, Accra','Teshie, Accra','Lapaz, Accra','Ablekuma, Accra','Sowutuom, Accra'];
-
-function genPhone(){return '024'+String(randInt(1000000,9999999));}
-
-function buildMember(idx){
-  const first=pick(FIRST_NAMES), last=pick(LAST_NAMES);
-  const name=`${first} ${last}`;
-  const cardNumber=String(idx);
-  const daily=pick([10,15,20,25,30,50]);
-  const joinDaysAgo=randInt(20,210);
-  const dateJoined=addDays(TODAY,-joinDaysAgo);
-  // build daily statuses since join
-  const payments={}; // iso -> {amount, time, recordedBy, note, status: 'paid'|'missed'|'skipped'}
-  let totalSavings=0, daysPaid=0, daysMissed=0, daysSkipped=0;
-
-  // decide if this member is a "flagged" 5-day-missed case
-  const forceStreak = idx===1?5: idx===4?5: idx===11?7 : 0;
-
-  for(let i=joinDaysAgo;i>=0;i--){
-    const day=addDays(TODAY,-i);
-    const iso=isoDate(day);
-    let paid;
-    if(forceStreak>0 && i< forceStreak){
-      paid=false;
-    } else {
-      paid = rng() < 0.86;
-    }
-    if(paid){
-      daysPaid++; totalSavings+=daily;
-      const hh=String(randInt(7,17)).padStart(2,'0'), mm=String(randInt(0,59)).padStart(2,'0');
-      payments[iso]={amount:daily,time:`${(hh%12)||12}:${mm} ${hh>=12?'PM':'AM'}`,recordedBy:'Admin',note:'',status:'paid'};
-    } else {
-      daysMissed++;
-    }
-  }
-  // find last payment date + current streak of misses
-  let lastPaymentDate=null, missStreak=0;
-  for(let i=0;i<=joinDaysAgo;i++){
-    const day=addDays(TODAY,-i); const iso=isoDate(day);
-    if(payments[iso] && payments[iso].status==='paid'){ if(!lastPaymentDate) lastPaymentDate=day; break; }
-    missStreak++;
-  }
-  const paidToday = !!(payments[isoDate(TODAY)] && payments[isoDate(TODAY)].status==='paid');
-
-  return {
-    id:idx, name, cardNumber, phone:genPhone(), address:pick(AREAS),
-    dateJoined, dailySavings:daily,
-    totalSavings /* net balance */, totalDeposited:totalSavings, totalWithdrawn:0,
-    daysPaid, daysMissed, daysSkipped:0,
-    payments, withdrawals:{}, paidToday, lastPaymentDate, missStreak, status:'Active'
-  };
+const SUPABASE_URL='https://iksgqlxfjieqdovxooyw.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_kRzzYkjwuckPg36ikRkPoA_V26TCC-0';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let MEMBERS=[];
+function dbDateToLocal(value){if(!value)return null;const [y,m,d]=String(value).slice(0,10).split('-').map(Number);return new Date(y,m-1,d);}
+function timeFromCreatedAt(value){if(!value)return '9:00 AM';const d=new Date(value);if(Number.isNaN(d.getTime()))return '9:00 AM';const h=d.getHours(),mi=String(d.getMinutes()).padStart(2,'0');return `${(h%12)||12}:${mi} ${h>=12?'PM':'AM'}`;}
+async function loadSupabaseData(){
+ const [membersRes,paymentsRes,withdrawalsRes]=await Promise.all([
+  supabaseClient.from('members').select('*').order('name',{ascending:true}),
+  supabaseClient.from('payments').select('*').order('payment_date',{ascending:true}),
+  supabaseClient.from('withdrawals').select('*').order('withdrawal_date',{ascending:true})
+ ]);
+ if(membersRes.error)throw membersRes.error;if(paymentsRes.error)throw paymentsRes.error;if(withdrawalsRes.error)throw withdrawalsRes.error;
+ const paymentsByMember={};
+ (paymentsRes.data||[]).forEach(row=>{const id=Number(row.member_id);if(!paymentsByMember[id])paymentsByMember[id]={};paymentsByMember[id][row.payment_date]={id:Number(row.id),amount:Number(row.amount)||0,time:timeFromCreatedAt(row.created_at),recordedBy:row.recorded_by||'Admin',note:row.note||'',status:row.status};});
+ const withdrawalsByMember={};
+ (withdrawalsRes.data||[]).forEach(row=>{const id=Number(row.member_id);if(!withdrawalsByMember[id])withdrawalsByMember[id]={};withdrawalsByMember[id][String(row.id)]={id:Number(row.id),iso:row.withdrawal_date,amount:Number(row.amount)||0,note:row.note||'',recordedBy:row.recorded_by||'Admin',time:timeFromCreatedAt(row.created_at)};});
+ MEMBERS=(membersRes.data||[]).map(row=>({id:Number(row.id),name:row.name,cardNumber:row.card_number,phone:row.phone,address:row.address||'',dateJoined:dbDateToLocal(row.date_joined),dailySavings:Number(row.daily_savings)||0,status:row.status||'Active',imageUrl:row.image_url||null,payments:paymentsByMember[Number(row.id)]||{},withdrawals:withdrawalsByMember[Number(row.id)]||{},totalSavings:0,totalDeposited:0,totalWithdrawn:0,daysPaid:0,daysMissed:0,daysSkipped:0,paidToday:false,lastPaymentDate:null,missStreak:0}));
+ MEMBERS.forEach(recomputeMemberDerived);return MEMBERS;
 }
-
-const MEMBERS = Array.from({length:34},(_,i)=>buildMember(i+1));
+async function refreshSupabaseData(){try{await loadSupabaseData();return true;}catch(err){console.error('Supabase data load failed:',err);toast('error','alertTri',err.message||'Could not load data from Supabase.');return false;}}
 
 /* ---------- derived collections ---------- */
+
 function todaysPaidMembers(){
   return MEMBERS.filter(m=>m.payments[isoDate(TODAY)] && m.payments[isoDate(TODAY)].status==='paid')
     .map(m=>({m, pay:m.payments[isoDate(TODAY)]}))
@@ -1707,72 +1613,18 @@ function openPaymentModal(memberId,dateIso){
     if(paidBtn) paidBtn.click();
   }
 }
-function confirmPayment(memberId, iso) {
-  const m = getMember(memberId);
-  const modalBody = document.querySelector('.modal-body');
-  const action = modalBody ? modalBody.dataset.selectedAction || 'paid' : 'paid';
-  const amount = action === 'paid' ? parseFloat(document.getElementById('pay-amount').value) || m.dailySavings : 0;
-  const note = document.getElementById('pay-note').value;
-
-  // Update payment record
-  if (action === 'paid') {
-    m.payments[iso] = {
-      amount: amount,
-      time: sameDay(new Date(iso), TODAY) ? nowTimeStr() : '9:00 AM',
-      recordedBy: 'Admin',
-      note: note,
-      status: 'paid'
-    };
-  } else {
-    m.payments[iso] = {
-      amount: 0,
-      time: sameDay(new Date(iso), TODAY) ? nowTimeStr() : '9:00 AM',
-      recordedBy: 'Admin',
-      note: note,
-      status: action // 'skipped' or 'missed'
-    };
-  }
-
-  // Recalculate member stats (totalSavings, daysPaid, daysMissed, missStreak, lastPaymentDate)
-  // directly from m.payments, so the derived numbers always match what's stored.
-  recomputeMemberDerived(m);
-  closeModal();
-
-  const actionMsg = action === 'paid' ? 'payment recorded' : `day marked as ${action}`;
-  toast('success', 'checkCircle', `${actionMsg} successfully.`);
-
-  // Re-render the whole profile page so the calendar cell, summary cards,
-  // status badges, and history table all reflect the new data immediately.
-  const currentMemberId = state.selectedMemberId;
-  go('member-profile', { selectedMemberId: currentMemberId });
+async function confirmPayment(memberId, iso){
+ const m=getMember(memberId);if(!m)return;const body=document.querySelector('.modal-body');const action=body?body.dataset.selectedAction||'paid':'paid';const amount=action==='paid'?parseFloat(document.getElementById('pay-amount').value)||m.dailySavings:0;const note=document.getElementById('pay-note').value.trim();
+ const {error}=await supabaseClient.from('payments').upsert({member_id:m.id,payment_date:iso,amount,status:action,note,recorded_by:'Admin'},{onConflict:'member_id,payment_date'});
+ if(error){console.error(error);toast('error','alertTri',error.message||'Could not save payment.');return;}closeModal();await refreshSupabaseData();toast('success','checkCircle',action==='paid'?'payment recorded successfully.':`day marked as ${action} successfully.`);go('member-profile',{selectedMemberId:m.id});
 }
 
 /* ---------- Bulk (multi-day) marking ---------- */
-function applyBulkAction(memberId, action){
-  const m=getMember(memberId);
-  const dates=Array.from(state.calSelectedDates);
-  if(dates.length===0) return;
-  dates.forEach(iso=>{
-    if(action==='paid'){
-      m.payments[iso]={
-        amount:m.dailySavings,
-        time: sameDay(new Date(iso),TODAY)?nowTimeStr():'9:00 AM',
-        recordedBy:'Admin', note:'Bulk update', status:'paid'
-      };
-    } else {
-      m.payments[iso]={
-        amount:0,
-        time: sameDay(new Date(iso),TODAY)?nowTimeStr():'9:00 AM',
-        recordedBy:'Admin', note:'Bulk update', status:action
-      };
-    }
-  });
-  recomputeMemberDerived(m);
-  const count=dates.length;
-  state.calSelecting=false;
-  state.calSelectedDates=new Set();
-  toast('success','checkCircle',`${count} day${count===1?'':'s'} marked as ${action}.`);
-  go('member-profile',{selectedMemberId:memberId});
+async function applyBulkAction(memberId,action){
+ const m=getMember(memberId),dates=Array.from(state.calSelectedDates);if(!m||dates.length===0)return;
+ const rows=dates.map(iso=>({member_id:m.id,payment_date:iso,amount:action==='paid'?m.dailySavings:0,status:action,note:'Bulk update',recorded_by:'Admin'}));
+ const {error}=await supabaseClient.from('payments').upsert(rows,{onConflict:'member_id,payment_date'});
+ if(error){console.error(error);toast('error','alertTri',error.message||'Could not save bulk payments.');return;}state.calSelecting=false;state.calSelectedDates=new Set();await refreshSupabaseData();toast('success','checkCircle',`${dates.length} day${dates.length===1?'':'s'} marked as ${action}.`);go('member-profile',{selectedMemberId:memberId});
 }
 
 /* ---------- Withdrawals ---------- */
@@ -1799,30 +1651,9 @@ function openWithdrawModal(memberId){
     </div>
   `);
 }
-function confirmWithdraw(memberId){
-  const m=getMember(memberId);
-  const amtInput=document.getElementById('withdraw-amount');
-  const amount=parseFloat(amtInput.value);
-  const errEl=document.getElementById('err-withdraw');
-  if(!amount || amount<=0 || amount>m.totalSavings){
-    errEl.classList.remove('hidden');
-    amtInput.classList.add('error');
-    return;
-  }
-  errEl.classList.add('hidden');
-  const note=document.getElementById('withdraw-note').value;
-  const id=genId();
-  m.withdrawals[id]={
-    iso: isoDate(TODAY),
-    amount: amount,
-    note: note,
-    recordedBy:'Admin',
-    time: nowTimeStr()
-  };
-  recomputeMemberDerived(m);
-  closeModal();
-  toast('success','minusCircle',`${GHSshort(amount)} withdrawn from ${m.name}'s savings.`);
-  go('member-profile',{selectedMemberId:memberId});
+async function confirmWithdraw(memberId){
+ const m=getMember(memberId);if(!m)return;const input=document.getElementById('withdraw-amount');const amount=parseFloat(input.value);const err=document.getElementById('err-withdraw');if(!amount||amount<=0||amount>m.totalSavings){err.classList.remove('hidden');input.classList.add('error');return;}err.classList.add('hidden');const note=document.getElementById('withdraw-note').value.trim();
+ const {error}=await supabaseClient.from('withdrawals').insert({member_id:m.id,amount,withdrawal_date:isoDate(TODAY),note,recorded_by:'Admin'});if(error){console.error(error);toast('error','alertTri',error.message||'Could not record withdrawal.');return;}closeModal();await refreshSupabaseData();toast('success','minusCircle',`${GHSshort(amount)} withdrawn from ${m.name}'s savings.`);go('member-profile',{selectedMemberId:memberId});
 }
 
 function nowTimeStr(){const h=NOW.getHours(),mi='0'+NOW.getMinutes();return `${(h%12)||12}:${mi.slice(-2)} ${h>=12?'PM':'AM'}`;}
@@ -1906,7 +1737,7 @@ function render(){
 /* =========================================================================
    EVENT DELEGATION
    ========================================================================= */
-document.addEventListener('click',function(e){
+document.addEventListener('click',async function(e){
   // nav items (sidebar + inline data-nav buttons)
   const navBtn=e.target.closest('[data-nav]');
   if(navBtn){
@@ -1943,6 +1774,7 @@ document.addEventListener('click',function(e){
   }
   if(e.target.closest('#sidebar-backdrop')){ closeSidebarMobile(); return; }
   if(e.target.closest('#logout-btn')){
+    await supabaseClient.auth.signOut();MEMBERS=[];
     document.getElementById('app-shell').classList.remove('active');
     document.getElementById('login-view').style.display='grid';
     return;
@@ -2062,7 +1894,7 @@ function closeSidebarMobile(){
 }
 
 /* Add member form submit */
-document.addEventListener('submit',function(e){
+document.addEventListener('submit',async function(e){
   if(e.target.id==='add-member-form'){
     e.preventDefault();
     const name=document.getElementById('f-name').value.trim();
@@ -2081,22 +1913,22 @@ document.addEventListener('submit',function(e){
     const daily=parseFloat(document.getElementById('f-daily').value)||20;
     const joined=new Date(document.getElementById('f-joined').value || isoDate(TODAY));
 
-    const newMember={
-      id: Math.max(...MEMBERS.map(m=>m.id))+1,
-      name, cardNumber:card, phone, address, dateJoined:joined,
-      dailySavings:daily, totalSavings:0, totalDeposited:0, totalWithdrawn:0, daysPaid:0, daysMissed:0, daysSkipped:0,
-      payments:{}, withdrawals:{}, paidToday:false, lastPaymentDate:null, missStreak:0, status:'Active'
-    };
-    MEMBERS.unshift(newMember);
+    const {error}=await supabaseClient.from('members').insert({name,card_number:card,phone,address,date_joined:isoDate(joined),daily_savings:daily,status:'Active'});
+    if(error){console.error(error);toast('error','alertTri',error.message||'Could not register member.');return;}
+    await refreshSupabaseData();
     toast('success','checkCircle',`${name} registered successfully.`);
     go('members');
   }
 
   if(e.target.id==='login-form'){
     e.preventDefault();
-    document.getElementById('login-view').style.display='none';
-    document.getElementById('app-shell').classList.add('active');
-    go('dashboard');
+    const email=document.getElementById('login-email').value.trim(),password=document.getElementById('login-password').value,btn=e.target.querySelector('button[type="submit"]');
+    btn.disabled=true;btn.textContent='Signing in…';
+    const {error}=await supabaseClient.auth.signInWithPassword({email,password});
+    btn.disabled=false;btn.textContent='Sign In';
+    if(error){console.error(error);toast('error','xCircle',error.message||'Sign in failed.');return;}
+    if(!await refreshSupabaseData()){await supabaseClient.auth.signOut();return;}
+    document.getElementById('login-view').style.display='none';document.getElementById('app-shell').classList.add('active');go('dashboard');
   }
 });
 
@@ -2125,7 +1957,10 @@ document.getElementById('login-security-note').innerHTML=`${icon('shieldCheck',1
 })();
 
 /* ---------- init ---------- */
-render();
+(async function initSupabase(){
+  try{const {data:{session}}=await supabaseClient.auth.getSession();if(session){if(await refreshSupabaseData()){document.getElementById('login-view').style.display='none';document.getElementById('app-shell').classList.add('active');}else await supabaseClient.auth.signOut();}}catch(err){console.error('Supabase initialization failed:',err);}
+  render();
+})();
 </script>
 </body>
 </html>

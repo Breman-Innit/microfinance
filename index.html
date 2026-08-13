@@ -143,6 +143,29 @@ body{
 .topbar-avatar-btn:hover{background:var(--gray-50);}
 .topbar-avatar-name{font-size:13px;font-weight:600;color:var(--gray-800);}
 
+/* User Dropdown */
+.user-dropdown{
+  position:absolute;top:56px;right:0;width:240px;max-width:calc(100vw - 32px);
+  background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow-lg);
+  z-index:50;overflow:hidden;
+}
+.user-dropdown.hidden{display:none;}
+.user-dropdown-item{
+  display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid var(--gray-100);
+  cursor:pointer;transition:background .15s;
+}
+.user-dropdown-item:hover{background:var(--gray-25);}
+.user-dropdown-item:last-child{border-bottom:none;}
+.user-dropdown-ico{
+  width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.user-dropdown-title{font-size:13.5px;font-weight:600;color:var(--gray-900);}
+.user-dropdown-sub{font-size:12.5px;color:var(--gray-500);margin-top:2px;line-height:1.45;}
+.user-dropdown-header{padding:14px 16px;border-bottom:1px solid var(--gray-100);}
+.user-dropdown-name{font-weight:700;font-size:14px;color:var(--gray-900);}
+.user-dropdown-email{font-size:12px;color:var(--gray-400);margin-top:2px;}
+.user-dropdown-item.logout .user-dropdown-title{color:var(--red-600);}
+
 .content{padding:26px 28px 60px;max-width:1400px;width:100%;overflow-x:hidden;}
 
 /* Notification dropdown */
@@ -158,7 +181,7 @@ body{
 .notif-item{display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .15s;}
 .notif-item:hover{background:var(--gray-25);}
 .notif-item:last-child{border-bottom:none;}
-.notif-ico{width:34px;height:34px;border-radius:50%;background:var(--red-50);color:var(--red-600);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notif-ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .notif-text-title{font-size:13.5px;font-weight:600;color:var(--gray-900);}
 .notif-text-body{font-size:12.5px;color:var(--gray-500);margin-top:2px;line-height:1.45;}
 .dropdown-empty{padding:30px 16px;text-align:center;color:var(--gray-400);font-size:13px;}
@@ -319,59 +342,19 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .info-item-label{font-size:11.5px;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.04em;font-weight:600;margin-bottom:4px;}
 .info-item-value{font-size:14px;color:var(--gray-900);font-weight:500;}
 .profile-cols{display:grid;grid-template-columns:1fr 1.15fr;gap:20px;align-items:start;margin-top:20px;}
-.calendar-full-section{width:100%;margin-top:20px;}
-.calendar-member-bar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:8px 0 20px;padding:4px 0;flex-wrap:wrap;}
-.calendar-member-info{display:flex;align-items:center;gap:14px;min-width:0;}
-.calendar-member-meta{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;}
-.calendar-member-meta .num{font-size:12px;color:var(--gray-500);font-family:var(--font-mono);}
-.calendar-member-bar .btn{flex-shrink:0;}
-.member-details-card{margin-top:4px;}
-.member-profile-section{width:100%;margin-top:20px;scroll-margin-top:90px;}
-.member-profile-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
-.member-info-grid{grid-template-columns:repeat(3,1fr);gap:22px 30px;}
 
 /* ============ CALENDAR ============ */
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
 .cal-nav-btn{width:32px;height:32px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--gray-600);}
 .cal-nav-btn:hover{background:var(--gray-50);}
 .cal-month-label{font-family:var(--font-display);font-weight:700;font-size:15px;}
-.cal-grid{
-  display:grid;
-  grid-template-columns:repeat(7,minmax(0,1fr));
-  gap:6px;
-  width:100%;
-  min-width:0;
-  align-items:stretch;
-}
-.cal-dow{
-  min-width:0;
-  text-align:center;
-  font-size:10.5px;
-  font-weight:700;
-  color:var(--gray-400);
-  text-transform:uppercase;
-  letter-spacing:0.03em;
-  padding:0 2px 4px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-dow{text-align:center;font-size:10.5px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.03em;padding-bottom:4px;}
 .cal-cell{
-  width:100%;
-  min-width:0;
-  aspect-ratio:1 / 1;
-  border-radius:10px;
-  border:1px solid var(--gray-200);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:2px;
-  background:var(--gray-25);
-  cursor:pointer;
-  transition:box-shadow .15s,border-color .15s;
-  position:relative;
+  aspect-ratio:1/0.92;border-radius:10px;border:1px solid var(--gray-200);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:var(--gray-25);cursor:pointer;transition:box-shadow .15s,border-color .15s;position:relative;
   padding:4px 2px;
-  overflow:hidden;
 }
 .cal-cell:hover{box-shadow:var(--shadow-sm);}
 .cal-cell.empty{background:transparent;border:none;cursor:default;}
@@ -384,24 +367,15 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .cal-cell.today{outline:2px solid var(--blue-500);outline-offset:1px;}
 .cal-cell.selectable-mode{cursor:pointer;}
 .cal-cell.selected{outline:2.5px solid var(--blue-500);outline-offset:1px;box-shadow:0 0 0 3px var(--blue-50) inset;}
-.cal-select-check{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:5px;border:1.6px solid var(--gray-300);background:#fff;display:flex;align-items:center;justify-content:center;color:transparent;z-index:2;}
+.cal-select-check{position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:5px;border:1.6px solid var(--gray-300);background:#fff;display:flex;align-items:center;justify-content:center;color:transparent;}
 .cal-cell.selected .cal-select-check{background:var(--blue-500);border-color:var(--blue-500);color:#fff;}
-.cal-daynum{
-  font-size:11px;
-  font-weight:700;
-  color:var(--gray-500);
-  position:absolute;
-  top:5px;
-  left:7px;
-  line-height:1;
-  z-index:1;
-}
+.cal-daynum{font-size:11px;font-weight:700;color:var(--gray-500);position:absolute;top:5px;left:7px;}
 .cal-cell.paid .cal-daynum{color:var(--green-700);}
 .cal-cell.missed .cal-daynum{color:var(--red-700);}
 .cal-cell.skipped .cal-daynum{color:var(--gray-500);}
-.cal-status-icon{margin-top:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.cal-status-text{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;margin-top:1px;line-height:1.1;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
-.cal-amount{font-family:var(--font-mono);font-size:10.5px;font-weight:700;margin-top:1px;line-height:1.1;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+.cal-status-icon{margin-top:8px;}
+.cal-status-text{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;margin-top:1px;}
+.cal-amount{font-family:var(--font-mono);font-size:10.5px;font-weight:700;margin-top:1px;}
 .cal-cell.paid .cal-status-text,.cal-cell.paid .cal-amount{color:var(--green-700);}
 .cal-cell.missed .cal-status-text{color:var(--red-700);}
 .cal-cell.skipped .cal-status-text{color:var(--gray-500);}
@@ -555,20 +529,15 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   .members-grid{grid-template-columns:1fr 1fr;gap:8px;}
   .member-card{padding:12px;}
   .info-grid{grid-template-columns:1fr;}
-  .member-info-grid{grid-template-columns:1fr;}
-  .member-profile-section-head{align-items:stretch;}
-  .member-profile-section-head .btn{width:100%;}
   .field-row{grid-template-columns:1fr;}
   .summary-cards{grid-template-columns:1fr 1fr;gap:8px;}
   .summary-card{padding:12px 13px;}
   .summary-card .val{font-size:16px;}
-  .cal-grid{gap:4px;}
+  .cal-grid{gap:3px;}
   .cal-status-text{display:none;}
-  .cal-amount{font-size:10px;line-height:1.15;}
-  .cal-daynum{top:5px;left:6px;font-size:12px;}
-  .cal-cell{padding:4px 2px;border-radius:9px;aspect-ratio:0.88 / 1;}
-  .cal-status-icon{margin-top:7px;}
-  .cal-select-check{width:15px;height:15px;top:4px;right:4px;border-radius:4px;}
+  .cal-amount{font-size:9px;}
+  .cal-daynum{position:static;margin-bottom:2px;}
+  .cal-cell{padding:4px 1px;}
   .dropdown-panel{right:10px;left:10px;width:auto;top:52px;}
   .modal-overlay{padding:0;align-items:flex-end;}
   .modal-box{width:100%;max-width:100%;border-radius:18px 18px 0 0;max-height:92vh;}
@@ -578,10 +547,6 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   tbody td{border-bottom:none;padding:5px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   tbody td::before{content:attr(data-label);font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;}
   .profile-header{flex-direction:column;align-items:flex-start;}
-  .calendar-member-bar{align-items:stretch;}
-  .calendar-member-info{width:100%;}
-  .calendar-member-bar > .btn{width:100%;}
-  .calendar-member-bar .page-title{font-size:19px;}
   .profile-header-actions{width:100%;}
   .profile-header-actions .btn{flex:1;}
   .action-buttons{grid-template-columns:1fr;}
@@ -601,26 +566,6 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   .report-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
   .chart-card{padding:14px;}
 }
-
-@media (max-width: 480px){
-  .cal-head{align-items:flex-start;}
-  .cal-head > div{width:100%;justify-content:space-between;}
-  .cal-month-label{font-size:14px;}
-  .cal-grid{gap:4px;}
-  .cal-dow{font-size:9.5px;padding-bottom:4px;}
-  .cal-cell{border-radius:8px;aspect-ratio:0.86 / 1;}
-  .cal-amount{font-size:9.5px;}
-}
-
-@media (max-width: 360px){
-  .cal-grid{gap:3px;}
-  .cal-cell{border-radius:7px;padding:3px 1px;aspect-ratio:0.86 / 1;}
-  .cal-daynum{font-size:11px;top:4px;left:4px;}
-  .cal-status-icon{margin-top:5px;}
-  .cal-amount{font-size:9px;}
-  .cal-select-check{width:13px;height:13px;top:3px;right:3px;}
-}
-
 @media (max-width: 400px){
   .members-grid{grid-template-columns:1fr;}
   .stats-grid{grid-template-columns:1fr;}
@@ -638,7 +583,6 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
       <div class="login-left-quote" style="margin-top:70px;">
         Every cedi counted. <span>Every member seen.</span> Savings operations built for trust.
       </div>
-      <div class="growth-chart" id="login-growth-chart"></div>
     </div>
     <div class="login-left-foot">© 2026 Limol's Microfinance. Savings &amp; Member Collection Management System.</div>
   </div>
@@ -654,7 +598,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
         <div class="field" style="margin-bottom:14px;">
           <label>Password</label>
           <div style="position:relative;">
-            <input type="password" id="login-password" value="••••••••••" required />
+            <input type="password" id="login-password" placeholder="Enter your password" required />
             <button type="button" class="pw-toggle" id="pw-toggle-btn"></button>
           </div>
         </div>
@@ -699,7 +643,36 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
           <button class="icon-btn" id="notif-bell-btn"></button>
           <div class="dropdown-panel hidden" id="notif-dropdown"></div>
         </div>
-        <button class="topbar-avatar-btn" id="topbar-avatar-btn"></button>
+        <div style="position:relative;">
+          <button class="topbar-avatar-btn" id="topbar-avatar-btn"></button>
+          <div class="user-dropdown hidden" id="user-dropdown">
+            <div class="user-dropdown-header">
+              <div class="user-dropdown-name" id="user-dropdown-name">Limol Admin</div>
+              <div class="user-dropdown-email" id="user-dropdown-email">admin@limolsmicrofinance.com</div>
+            </div>
+            <div class="user-dropdown-item" id="user-profile-btn">
+              <div class="user-dropdown-ico" id="user-profile-ico" style="background:var(--blue-50);color:var(--blue-500);"></div>
+              <div>
+                <div class="user-dropdown-title">My Profile</div>
+                <div class="user-dropdown-sub">View your admin information</div>
+              </div>
+            </div>
+            <div class="user-dropdown-item" id="user-settings-btn">
+              <div class="user-dropdown-ico" id="user-settings-ico" style="background:var(--gray-100);color:var(--gray-600);"></div>
+              <div>
+                <div class="user-dropdown-title">Settings</div>
+                <div class="user-dropdown-sub">Change password & preferences</div>
+              </div>
+            </div>
+            <div class="user-dropdown-item logout" id="user-logout-btn">
+              <div class="user-dropdown-ico" id="user-logout-ico" style="background:var(--red-50);color:var(--red-600);"></div>
+              <div>
+                <div class="user-dropdown-title">Log Out</div>
+                <div class="user-dropdown-sub">Sign out of your account</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
     <main class="content" id="content"></main>
@@ -709,17 +682,11 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 <div class="modal-overlay hidden" id="modal-overlay"><div class="modal-box" id="modal-box"></div></div>
 <div id="toast-stack"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =========================================================================
-   ENOCH'S MICROFINANCE — SPA logic
+   LIMOL'S MICROFINANCE — SPA logic
    ========================================================================= */
-
-/* ---------- seeded RNG ---------- */
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-const rng = mulberry32(20260810);
-function rand(a,b){return a+rng()*(b-a);}
-function randInt(a,b){return Math.floor(rand(a,b+1));}
-function pick(arr){return arr[randInt(0,arr.length-1)];}
 
 /* ---------- icon library (simple line icons) ---------- */
 const ICONS = {
@@ -762,7 +729,9 @@ const ICONS = {
   ban:'<circle cx="12" cy="12" r="9"/><path d="m5 5 14 14"/>',
   checkSquare:'<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="m8 12 2.5 2.5L16.5 9"/>',
   minusCircle:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
-  arrowDownCircle:'<circle cx="12" cy="12" r="9"/><path d="M12 7v8"/><path d="m8.5 12 3.5 3.5L15.5 12"/>'
+  arrowDownCircle:'<circle cx="12" cy="12" r="9"/><path d="M12 7v8"/><path d="m8.5 12 3.5 3.5L15.5 12"/>',
+  user:'<circle cx="12" cy="8" r="3.5"/><path d="M5.5 21v-2.5a4.5 4.5 0 0 1 4.5-4.5h4a4.5 4.5 0 0 1 4.5 4.5V21"/>',
+  settings:'<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>'
 };
 function icon(name,size=18,strokeWidth=2){
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
@@ -799,73 +768,62 @@ function fmtDateFull(d){const dow=['Sunday','Monday','Tuesday','Wednesday','Thur
 function isoDate(d){return d.toISOString().slice(0,10);}
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function sameDay(a,b){return isoDate(a)===isoDate(b);}
-let __idCounter=1;
-function genId(){return 'tx'+(__idCounter++)+'_'+Math.floor(rng()*100000);}
 
 const NOW = new Date(); // real current date & time
 const TODAY = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate()); // date-only, midnight, for day comparisons
 
-/* =========================================================================
-   MOCK DATA GENERATION
-   ========================================================================= */
-const FIRST_NAMES=['Kwame','Ama','Kofi','Akosua','Yaw','Efua','Kwabena','Adjoa','Kwaku','Abena','Kojo','Afia','Yaw','Esi','Nana','Adwoa','Fiifi','Akua','Kwesi','Araba','Ebo','Baaba','Kwadwo','Sena','Elikem','Selorm','Mawusi','Nafisa','Ibrahim','Fatima','Yussif','Zainab','Emmanuel','Comfort','Prince','Gifty','Solomon','Rita','Isaac','Linda'];
-const LAST_NAMES=['Mensah','Boateng','Owusu','Asante','Agyeman','Appiah','Osei','Darko','Amoah','Adjei','Frimpong','Antwi','Nkrumah','Gyasi','Ofori','Yeboah','Sarpong','Danquah','Tetteh','Quaye','Addo','Ankrah','Bediako','Kusi'];
-const AREAS=['Adabraka, Accra','Osu, Accra','Madina, Accra','Kaneshie, Accra','Tema Community 5','Ashaiman','Dansoman, Accra','Nungua, Accra','East Legon, Accra','Achimota, Accra','Abeka, Accra','Teshie, Accra','Lapaz, Accra','Ablekuma, Accra','Sowutuom, Accra'];
-
-function genPhone(){return '024'+String(randInt(1000000,9999999));}
-
-function buildMember(idx){
-  const first=pick(FIRST_NAMES), last=pick(LAST_NAMES);
-  const name=`${first} ${last}`;
-  const cardNumber=String(idx);
-  const daily=pick([10,15,20,25,30,50]);
-  const joinDaysAgo=randInt(20,210);
-  const dateJoined=addDays(TODAY,-joinDaysAgo);
-  // build daily statuses since join
-  const payments={}; // iso -> {amount, time, recordedBy, note, status: 'paid'|'missed'|'skipped'}
-  let totalSavings=0, daysPaid=0, daysMissed=0, daysSkipped=0;
-
-  // decide if this member is a "flagged" 5-day-missed case
-  const forceStreak = idx===1?5: idx===4?5: idx===11?7 : 0;
-
-  for(let i=joinDaysAgo;i>=0;i--){
-    const day=addDays(TODAY,-i);
-    const iso=isoDate(day);
-    let paid;
-    if(forceStreak>0 && i< forceStreak){
-      paid=false;
-    } else {
-      paid = rng() < 0.86;
-    }
-    if(paid){
-      daysPaid++; totalSavings+=daily;
-      const hh=String(randInt(7,17)).padStart(2,'0'), mm=String(randInt(0,59)).padStart(2,'0');
-      payments[iso]={amount:daily,time:`${(hh%12)||12}:${mm} ${hh>=12?'PM':'AM'}`,recordedBy:'Admin',note:'',status:'paid'};
-    } else {
-      daysMissed++;
-    }
+/* ---------- current user (cached; supabase-js v2 auth is async) ---------- */
+let CURRENT_SESSION_USER = null;
+function getCurrentUser(){
+  return CURRENT_SESSION_USER;
+}
+function getCurrentUserName(){
+  const user = getCurrentUser();
+  if(user && user.user_metadata && user.user_metadata.name){
+    return user.user_metadata.name;
   }
-  // find last payment date + current streak of misses
-  let lastPaymentDate=null, missStreak=0;
-  for(let i=0;i<=joinDaysAgo;i++){
-    const day=addDays(TODAY,-i); const iso=isoDate(day);
-    if(payments[iso] && payments[iso].status==='paid'){ if(!lastPaymentDate) lastPaymentDate=day; break; }
-    missStreak++;
+  if(user && user.email){
+    const emailName = user.email.split('@')[0];
+    return emailName.charAt(0).toUpperCase() + emailName.slice(1);
   }
-  const paidToday = !!(payments[isoDate(TODAY)] && payments[isoDate(TODAY)].status==='paid');
-
-  return {
-    id:idx, name, cardNumber, phone:genPhone(), address:pick(AREAS),
-    dateJoined, dailySavings:daily,
-    totalSavings /* net balance */, totalDeposited:totalSavings, totalWithdrawn:0,
-    daysPaid, daysMissed, daysSkipped:0,
-    payments, withdrawals:{}, paidToday, lastPaymentDate, missStreak, status:'Active'
-  };
+  return 'Admin';
+}
+function getCurrentUserEmail(){
+  const user = getCurrentUser();
+  return user?.email || 'admin@limolsmicrofinance.com';
+}
+function greeting(){
+  const h=NOW.getHours(); 
+  return h<12 ? 'Good morning' : h<17 ? 'Good afternoon' : 'Good evening';
 }
 
-const MEMBERS = Array.from({length:34},(_,i)=>buildMember(i+1));
+/* =========================================================================
+   SUPABASE DATA LAYER
+   ========================================================================= */
+const SUPABASE_URL='https://iksgqlxfjieqdovxooyw.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_kRzzYkjwuckPg36ikRkPoA_V26TCC-0';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let MEMBERS=[];
+function dbDateToLocal(value){if(!value)return null;const [y,m,d]=String(value).slice(0,10).split('-').map(Number);return new Date(y,m-1,d);}
+function timeFromCreatedAt(value){if(!value)return '9:00 AM';const d=new Date(value);if(Number.isNaN(d.getTime()))return '9:00 AM';const h=d.getHours(),mi=String(d.getMinutes()).padStart(2,'0');return `${(h%12)||12}:${mi} ${h>=12?'PM':'AM'}`;}
+async function loadSupabaseData(){
+ const [membersRes,paymentsRes,withdrawalsRes]=await Promise.all([
+  supabaseClient.from('members').select('*').order('name',{ascending:true}),
+  supabaseClient.from('payments').select('*').order('payment_date',{ascending:true}),
+  supabaseClient.from('withdrawals').select('*').order('withdrawal_date',{ascending:true})
+ ]);
+ if(membersRes.error)throw membersRes.error;if(paymentsRes.error)throw paymentsRes.error;if(withdrawalsRes.error)throw withdrawalsRes.error;
+ const paymentsByMember={};
+ (paymentsRes.data||[]).forEach(row=>{const id=Number(row.member_id);if(!paymentsByMember[id])paymentsByMember[id]={};paymentsByMember[id][row.payment_date]={id:Number(row.id),amount:Number(row.amount)||0,time:timeFromCreatedAt(row.created_at),recordedBy:row.recorded_by||'Admin',note:row.note||'',status:row.status};});
+ const withdrawalsByMember={};
+ (withdrawalsRes.data||[]).forEach(row=>{const id=Number(row.member_id);if(!withdrawalsByMember[id])withdrawalsByMember[id]={};withdrawalsByMember[id][String(row.id)]={id:Number(row.id),iso:row.withdrawal_date,amount:Number(row.amount)||0,note:row.note||'',recordedBy:row.recorded_by||'Admin',time:timeFromCreatedAt(row.created_at)};});
+ MEMBERS=(membersRes.data||[]).map(row=>({id:Number(row.id),name:row.name,cardNumber:row.card_number,phone:row.phone,address:row.address||'',dateJoined:dbDateToLocal(row.date_joined),dailySavings:Number(row.daily_savings)||0,status:row.status||'Active',imageUrl:row.image_url||null,payments:paymentsByMember[Number(row.id)]||{},withdrawals:withdrawalsByMember[Number(row.id)]||{},totalSavings:0,totalDeposited:0,totalWithdrawn:0,daysPaid:0,daysMissed:0,daysSkipped:0,paidToday:false,lastPaymentDate:null,missStreak:0}));
+ MEMBERS.forEach(recomputeMemberDerived);return MEMBERS;
+}
+async function refreshSupabaseData(){try{await loadSupabaseData();return true;}catch(err){console.error('Supabase data load failed:',err);toast('error','alertTri',err.message||'Could not load data from Supabase.');return false;}}
 
 /* ---------- derived collections ---------- */
+
 function todaysPaidMembers(){
   return MEMBERS.filter(m=>m.payments[isoDate(TODAY)] && m.payments[isoDate(TODAY)].status==='paid')
     .map(m=>({m, pay:m.payments[isoDate(TODAY)]}))
@@ -890,7 +848,6 @@ function totalSavingsAll(){return MEMBERS.reduce((s,m)=>s+m.totalSavings,0);}
 function totalDepositedAll(){return MEMBERS.reduce((s,m)=>s+m.totalDeposited,0);}
 function totalWithdrawnAll(){return MEMBERS.reduce((s,m)=>s+m.totalWithdrawn,0);}
 function collectedToday(){return todaysPaidMembers().reduce((s,x)=>s+x.pay.amount,0);}
-function greeting(){const h=NOW.getHours(); return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
 
 /* =========================================================================
    APP STATE + ROUTER
@@ -922,6 +879,7 @@ function go(route,opts={}){
   state.route=route;
   Object.assign(state,opts);
   document.getElementById('notif-dropdown').classList.add('hidden');
+  document.getElementById('user-dropdown').classList.add('hidden');
   window.scrollTo(0,0);
   render();
 }
@@ -935,16 +893,29 @@ function renderChrome(){
   Object.keys(NAV_LABELS).forEach(key=>{
     const btn=nav.querySelector(`[data-nav="${key}"]`);
     btn.innerHTML=`${icon(NAV_LABELS[key].icon,18)}<span>${NAV_LABELS[key].label}</span>`;
-    btn.classList.toggle('active', state.route===key || (key==='members' && (state.route==='member-profile'||state.route==='member-details'||state.route==='add-member')));
+    btn.classList.toggle('active', state.route===key || (key==='members' && (state.route==='member-profile'||state.route==='add-member')));
   });
-  document.getElementById('sidebar-user-slot').innerHTML=`${avatar('Limol Admin',36)}<div><div class="sidebar-user-name">Limol Admin</div><div class="sidebar-user-role">Administrator</div></div>`;
+  
+  const userName = getCurrentUserName();
+  document.getElementById('sidebar-user-slot').innerHTML=`${avatar(userName,36)}<div><div class="sidebar-user-name">${userName}</div><div class="sidebar-user-role">Administrator</div></div>`;
   document.getElementById('logout-btn').innerHTML=`${icon('logout',16)}<span>Log out</span>`;
   document.getElementById('hamburger-btn').innerHTML=icon('menu',20);
-  document.getElementById('topbar-title').textContent = NAV_LABELS[state.route]?.label || (state.route==='member-details' ? 'Member Profile' : state.route==='member-profile' ? 'Savings Calendar' : state.route==='add-member' ? 'Register Member' : "Limol's Microfinance");
+  document.getElementById('topbar-title').textContent = NAV_LABELS[state.route]?.label || (state.route==='member-profile' ? 'Member Profile' : state.route==='add-member' ? 'Register Member' : "Limol's Microfinance");
   const bell=document.getElementById('notif-bell-btn');
   const flagged=flaggedMembers();
   bell.innerHTML=icon('bell',18)+(flagged.length?`<span class="notif-dot">${flagged.length}</span>`:'');
-  document.getElementById('topbar-avatar-btn').innerHTML=`${avatar('Limol Admin',30)}<span class="topbar-avatar-name">Admin</span>${icon('chevDown',15)}`;
+  
+  // Update user dropdown
+  const userEmail = getCurrentUserEmail();
+  document.getElementById('topbar-avatar-btn').innerHTML=`${avatar(userName,30)}<span class="topbar-avatar-name">${userName}</span>${icon('chevDown',15)}`;
+  document.getElementById('user-dropdown-name').textContent = userName;
+  document.getElementById('user-dropdown-email').textContent = userEmail;
+
+  // Populate the static user-dropdown menu icons (these are plain HTML, not template literals)
+  document.getElementById('user-profile-ico').innerHTML = icon('user',17);
+  document.getElementById('user-settings-ico').innerHTML = icon('settings',17);
+  document.getElementById('user-logout-ico').innerHTML = icon('logout',17);
+  
   renderNotifDropdown();
 }
 
@@ -957,7 +928,7 @@ function renderNotifDropdown(){
     ${flagged.length===0?`<div class="dropdown-empty">No missed-payment alerts right now.</div>`:
       flagged.map(m=>`
       <div class="notif-item" data-goto-member="${m.id}">
-        <div class="notif-ico">${icon('alertTri',17)}</div>
+        <div class="notif-ico" style="background:var(--red-50);color:var(--red-600);">${icon('alertTri',17)}</div>
         <div>
           <div class="notif-text-title">${m.name}</div>
           <div class="notif-text-body">Has not made a payment for ${m.missStreak} consecutive day${m.missStreak===1?'':'s'}.<br/>Last payment: ${m.lastPaymentDate?fmtDateLong(m.lastPaymentDate):'No payments recorded'}.</div>
@@ -978,12 +949,13 @@ function pageDashboard(){
   const paidTodayCount=todaysPaidMembers().length;
   const expected=totalMembers;
   const notYet=expected-paidTodayCount;
-  const pct=Math.round((paidTodayCount/expected)*100);
+  const pct=expected>0?Math.round((paidTodayCount/expected)*100):0;
+  const userName = getCurrentUserName();
 
   return `
   <div>
     <div class="eyebrow">${fmtDateFull(TODAY)}</div>
-    <h1 class="page-title" style="margin-top:4px;">${greeting()}, Admin</h1>
+    <h1 class="page-title" style="margin-top:4px;">${greeting()}, ${userName}</h1>
     <div class="page-subtitle">Here's an overview of your savings activities today.</div>
   </div>
 
@@ -1012,7 +984,7 @@ function pageDashboard(){
 
   <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-top:20px;">
     <div class="stat-card" style="--accent:var(--navy-800);--accent-bg:var(--blue-50);">
-      <div class="stat-top"><div class="stat-icon">${icon('users',19)}</div><span class="stat-trend up">${icon('trendUp',12)} +4 this mo.</span></div>
+      <div class="stat-top"><div class="stat-icon">${icon('users',19)}</div><span class="stat-trend up">${icon('trendUp',12)} Active</span></div>
       <div class="stat-value num">${totalMembers}</div>
       <div class="stat-label">Total Members</div>
     </div>
@@ -1108,9 +1080,6 @@ function pageMembers(){
   `;
 }
 
-/* Simplified member cards for the list page — just identity + status.
-   Detailed financials (daily rate, total savings, days paid/missed, etc.)
-   live on the member's own profile page so this overview page stays scannable. */
 function renderMembersGrid(list){
   return `<div class="members-grid">
     ${list.map(m=>`
@@ -1231,37 +1200,6 @@ function pageMemberProfile(id){
   if(!m) return emptyState('users','Member not found','This member may have been removed.','members','Back to Members');
   return `
   <a class="back-link" data-nav="members">${icon('chevLeft',15)} Back to Members</a>
-
-  <div class="calendar-member-bar">
-    <div class="calendar-member-info">
-      ${avatar(m.name,52,'member-photo')}
-      <div>
-        <div class="eyebrow">Savings Calendar</div>
-        <h1 class="page-title">${m.name}</h1>
-        <div class="calendar-member-meta">
-          <span class="num">${m.cardNumber}</span>
-          <span class="badge badge-green">${icon('checkCircle',12)} ${m.status}</span>
-        </div>
-      </div>
-    </div>
-    <button class="btn btn-secondary" id="member-profile-jump">${icon('users',15)} Member Profile</button>
-  </div>
-
-  <div class="calendar-full-section card card-pad" id="calendar-card">
-    ${renderCalendarCard(m)}
-  </div>
-  `;
-}
-
-/* =========================================================================
-   PAGE: MEMBER PROFILE DETAILS
-   ========================================================================= */
-function pageMemberDetails(id){
-  const m=getMember(id);
-  if(!m) return emptyState('users','Member not found','This member may have been removed.','members','Back to Members');
-  return `
-  <a class="back-link" data-nav="members">${icon('chevLeft',15)} Back to Members</a>
-
   <div class="profile-header">
     ${avatar(m.name,72,'member-photo')}
     <div class="profile-header-info">
@@ -1273,7 +1211,6 @@ function pageMemberDetails(id){
       </div>
     </div>
     <div class="profile-header-actions">
-      <button class="btn btn-secondary" id="member-details-calendar">${icon('calCheck',15)} Savings Calendar</button>
       <button class="btn btn-secondary" id="edit-member-btn">${icon('edit',15)} Edit Member</button>
       <button class="btn btn-warning" id="withdraw-btn" data-member="${m.id}">${icon('minusCircle',15)} Withdraw Funds</button>
     </div>
@@ -1290,22 +1227,26 @@ function pageMemberDetails(id){
     <div class="summary-card"><div class="eyebrow">Days Missed</div><div class="val" style="color:${m.daysMissed>0?'var(--red-700)':'var(--gray-900)'};">${m.daysMissed}</div></div>
   </div>
 
-  <div class="member-profile-section card card-pad member-details-card">
-    <div class="member-profile-section-head">
-      <div>
-        <div class="eyebrow">Member Details</div>
-        <h3 class="section-title" style="margin-top:4px;">Personal & Savings Information</h3>
-        <div class="page-subtitle">Complete information for ${m.name}.</div>
+  <div class="profile-cols">
+    <div class="card card-pad">
+      <h3 class="section-title" style="margin-bottom:16px;">Member Information</h3>
+      <div class="info-grid">
+        <div><div class="info-item-label">Full Name</div><div class="info-item-value">${m.name}</div></div>
+        <div><div class="info-item-label">Card / Member Number</div><div class="info-item-value num">${m.cardNumber}</div></div>
+        <div><div class="info-item-label">Phone</div><div class="info-item-value">${icon('phone',13)} ${m.phone}</div></div>
+        <div><div class="info-item-label">Address</div><div class="info-item-value">${icon('mapPin',13)} ${m.address}</div></div>
+        <div><div class="info-item-label">Date Joined</div><div class="info-item-value">${fmtDateLong(m.dateJoined)}</div></div>
+        <div><div class="info-item-label">Daily Savings Rate</div><div class="info-item-value num">${GHSshort(m.dailySavings)}</div></div>
       </div>
     </div>
-    <div class="info-grid member-info-grid">
-      <div><div class="info-item-label">Full Name</div><div class="info-item-value">${m.name}</div></div>
-      <div><div class="info-item-label">Card / Member Number</div><div class="info-item-value num">${m.cardNumber}</div></div>
-      <div><div class="info-item-label">Phone</div><div class="info-item-value">${icon('phone',13)} ${m.phone}</div></div>
-      <div><div class="info-item-label">Address</div><div class="info-item-value">${icon('mapPin',13)} ${m.address}</div></div>
-      <div><div class="info-item-label">Date Joined</div><div class="info-item-value">${fmtDateLong(m.dateJoined)}</div></div>
-      <div><div class="info-item-label">Daily Savings Rate</div><div class="info-item-value num">${GHSshort(m.dailySavings)}</div></div>
+
+    <div class="card card-pad" id="calendar-card">
+      ${renderCalendarCard(m)}
     </div>
+  </div>
+
+  <div class="card card-pad" id="history-card" style="margin-top:20px;">
+    ${renderHistoryCard(m)}
   </div>
   `;
 }
@@ -1331,10 +1272,6 @@ function renderCalendarCard(m){
     const beforeJoin = day < m.dateJoined;
     let cls='cal-cell', body='';
 
-    // An explicit payment record always wins, regardless of whether the
-    // date happens to be in the future, today, or the past — otherwise a
-    // pre-recorded future payment (which the modal explicitly allows) gets
-    // masked by the "future" default and never shows as paid/skipped/missed.
     if(status === 'paid'){
       cls+=' paid';
       body=`<div class="cal-daynum">${day.getDate()}</div><div class="cal-status-icon">${icon('checkCircle',14)}</div><div class="cal-status-text">Paid</div><div class="cal-amount">${GHSshort(pay.amount)}</div>`;
@@ -1637,7 +1574,7 @@ function pageNotificationsFull(){
     ${flagged.length===0? emptyState('checkCircle','All caught up','No members currently have missed-payment alerts.',null,null) :
     flagged.map(m=>`
       <div class="list-row" style="padding:16px 18px;" data-goto-member="${m.id}">
-        <div class="notif-ico">${icon('alertTri',18)}</div>
+        <div class="notif-ico" style="background:var(--red-50);color:var(--red-600);">${icon('alertTri',18)}</div>
         <div>
           <div class="list-row-name">${m.name}</div>
           <div class="list-row-meta">Has not made a payment for ${m.missStreak} consecutive days. Last payment: ${m.lastPaymentDate?fmtDateLong(m.lastPaymentDate):'No payments recorded'}.</div>
@@ -1657,6 +1594,113 @@ function openModal(html){
 }
 function closeModal(){document.getElementById('modal-overlay').classList.add('hidden');}
 
+function openProfileModal(){
+  const userName = getCurrentUserName();
+  const userEmail = getCurrentUserEmail();
+  const user = getCurrentUser();
+  const joined = user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
+  
+  openModal(`
+    <div class="modal-head"><h3>👤 My Profile</h3><button class="modal-close" id="modal-close-btn">${icon('x',15)}</button></div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
+        ${avatar(userName,80,'avatar')}
+        <div style="font-weight:700;font-size:18px;margin-top:10px;">${userName}</div>
+        <div style="color:var(--gray-400);font-size:13px;">${userEmail}</div>
+      </div>
+      <div class="info-grid" style="margin-top:8px;">
+        <div><div class="info-item-label">Full Name</div><div class="info-item-value">${userName}</div></div>
+        <div><div class="info-item-label">Email</div><div class="info-item-value">${userEmail}</div></div>
+        <div><div class="info-item-label">Role</div><div class="info-item-value"><span class="badge badge-blue">Administrator</span></div></div>
+        <div><div class="info-item-label">Account Created</div><div class="info-item-value">${joined}</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-cancel-btn">Close</button>
+    </div>
+  `);
+}
+
+function openSettingsModal(){
+  openModal(`
+    <div class="modal-head"><h3>⚙️ Settings</h3><button class="modal-close" id="modal-close-btn">${icon('x',15)}</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:20px;">
+        <h4 style="font-size:14px;margin-bottom:12px;">Change Password</h4>
+        <div class="field">
+          <label>Current Password</label>
+          <input type="password" id="settings-current-pw" placeholder="Enter current password"/>
+        </div>
+        <div class="field">
+          <label>New Password</label>
+          <input type="password" id="settings-new-pw" placeholder="Enter new password (min 6 characters)"/>
+        </div>
+        <div class="field">
+          <label>Confirm New Password</label>
+          <input type="password" id="settings-confirm-pw" placeholder="Confirm new password"/>
+        </div>
+        <div class="error-msg hidden" id="settings-error">${icon('alertTri',12)} <span id="settings-error-text"></span></div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <h4 style="font-size:14px;margin-bottom:12px;">Notifications</h4>
+        <label class="checkbox-row" style="margin-bottom:8px;">
+          <input type="checkbox" checked/> Email notifications for missed payments
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" checked/> Daily collection summary
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="settings-save-btn">${icon('checkCircle',15)} Save Settings</button>
+    </div>
+  `);
+  
+  // Add settings save handler
+  document.getElementById('settings-save-btn')?.addEventListener('click', async function(){
+    const currentPw = document.getElementById('settings-current-pw').value;
+    const newPw = document.getElementById('settings-new-pw').value;
+    const confirmPw = document.getElementById('settings-confirm-pw').value;
+    const errorEl = document.getElementById('settings-error');
+    const errorText = document.getElementById('settings-error-text');
+    
+    if(!currentPw || !newPw || !confirmPw){
+      errorEl.classList.remove('hidden');
+      errorText.textContent = 'All password fields are required.';
+      return;
+    }
+    if(newPw.length < 6){
+      errorEl.classList.remove('hidden');
+      errorText.textContent = 'New password must be at least 6 characters.';
+      return;
+    }
+    if(newPw !== confirmPw){
+      errorEl.classList.remove('hidden');
+      errorText.textContent = 'Passwords do not match.';
+      return;
+    }
+    
+    errorEl.classList.add('hidden');
+    this.disabled = true;
+    this.textContent = 'Updating...';
+    
+    const { error } = await supabaseClient.auth.updateUser({ password: newPw });
+    
+    this.disabled = false;
+    this.textContent = 'Save Settings';
+    
+    if(error){
+      errorEl.classList.remove('hidden');
+      errorText.textContent = error.message || 'Failed to update password.';
+      return;
+    }
+    
+    closeModal();
+    toast('success','checkCircle','Password updated successfully!');
+  });
+}
+
 function openPaymentModal(memberId,dateIso){
   const m=getMember(memberId);
   const date=dateIso?new Date(dateIso):TODAY;
@@ -1664,8 +1708,6 @@ function openPaymentModal(memberId,dateIso){
   const existing = m.payments[iso];
   const status = existing ? existing.status : null;
   const isFuture = date > TODAY;
-
-  // Check if date is before member joined
   const beforeJoin = date < m.dateJoined;
 
   let statusMessage = '';
@@ -1723,17 +1765,14 @@ function openPaymentModal(memberId,dateIso){
     </div>
   `);
 
-  // Add action button listeners
   document.querySelectorAll('.action-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const action = this.dataset.action;
-      // Update active state
       document.querySelectorAll('.action-btn').forEach(b => {
         b.className = 'action-btn';
       });
       this.classList.add(`active-${action}`);
 
-      // Show/hide amount field for paid
       const amountField = document.getElementById('amount-field');
       if(action === 'paid') {
         amountField.style.display = 'block';
@@ -1741,87 +1780,31 @@ function openPaymentModal(memberId,dateIso){
         amountField.style.display = 'none';
       }
 
-      // Store selected action
       this.closest('.modal-body').dataset.selectedAction = action;
     });
   });
 
-  // Set default active if status exists
   if(status) {
     const actionBtn = document.querySelector(`.action-btn[data-action="${status}"]`);
     if(actionBtn) actionBtn.click();
   } else {
-    // Default to paid if no status
     const paidBtn = document.querySelector('.action-btn[data-action="paid"]');
     if(paidBtn) paidBtn.click();
   }
 }
-function confirmPayment(memberId, iso) {
-  const m = getMember(memberId);
-  const modalBody = document.querySelector('.modal-body');
-  const action = modalBody ? modalBody.dataset.selectedAction || 'paid' : 'paid';
-  const amount = action === 'paid' ? parseFloat(document.getElementById('pay-amount').value) || m.dailySavings : 0;
-  const note = document.getElementById('pay-note').value;
 
-  // Update payment record
-  if (action === 'paid') {
-    m.payments[iso] = {
-      amount: amount,
-      time: sameDay(new Date(iso), TODAY) ? nowTimeStr() : '9:00 AM',
-      recordedBy: 'Admin',
-      note: note,
-      status: 'paid'
-    };
-  } else {
-    m.payments[iso] = {
-      amount: 0,
-      time: sameDay(new Date(iso), TODAY) ? nowTimeStr() : '9:00 AM',
-      recordedBy: 'Admin',
-      note: note,
-      status: action // 'skipped' or 'missed'
-    };
-  }
-
-  // Recalculate member stats (totalSavings, daysPaid, daysMissed, missStreak, lastPaymentDate)
-  // directly from m.payments, so the derived numbers always match what's stored.
-  recomputeMemberDerived(m);
-  closeModal();
-
-  const actionMsg = action === 'paid' ? 'payment recorded' : `day marked as ${action}`;
-  toast('success', 'checkCircle', `${actionMsg} successfully.`);
-
-  // Re-render the whole profile page so the calendar cell, summary cards,
-  // status badges, and history table all reflect the new data immediately.
-  const currentMemberId = state.selectedMemberId;
-  go('member-profile', { selectedMemberId: currentMemberId });
+async function confirmPayment(memberId, iso){
+ const m=getMember(memberId);if(!m)return;const body=document.querySelector('.modal-body');const action=body?body.dataset.selectedAction||'paid':'paid';const amount=action==='paid'?parseFloat(document.getElementById('pay-amount').value)||m.dailySavings:0;const note=document.getElementById('pay-note').value.trim();
+ const {error}=await supabaseClient.from('payments').upsert({member_id:m.id,payment_date:iso,amount,status:action,note,recorded_by:'Admin'},{onConflict:'member_id,payment_date'});
+ if(error){console.error(error);toast('error','alertTri',error.message||'Could not save payment.');return;}closeModal();await refreshSupabaseData();toast('success','checkCircle',action==='paid'?'payment recorded successfully.':`day marked as ${action} successfully.`);go('member-profile',{selectedMemberId:m.id});
 }
 
 /* ---------- Bulk (multi-day) marking ---------- */
-function applyBulkAction(memberId, action){
-  const m=getMember(memberId);
-  const dates=Array.from(state.calSelectedDates);
-  if(dates.length===0) return;
-  dates.forEach(iso=>{
-    if(action==='paid'){
-      m.payments[iso]={
-        amount:m.dailySavings,
-        time: sameDay(new Date(iso),TODAY)?nowTimeStr():'9:00 AM',
-        recordedBy:'Admin', note:'Bulk update', status:'paid'
-      };
-    } else {
-      m.payments[iso]={
-        amount:0,
-        time: sameDay(new Date(iso),TODAY)?nowTimeStr():'9:00 AM',
-        recordedBy:'Admin', note:'Bulk update', status:action
-      };
-    }
-  });
-  recomputeMemberDerived(m);
-  const count=dates.length;
-  state.calSelecting=false;
-  state.calSelectedDates=new Set();
-  toast('success','checkCircle',`${count} day${count===1?'':'s'} marked as ${action}.`);
-  go('member-profile',{selectedMemberId:memberId});
+async function applyBulkAction(memberId,action){
+ const m=getMember(memberId),dates=Array.from(state.calSelectedDates);if(!m||dates.length===0)return;
+ const rows=dates.map(iso=>({member_id:m.id,payment_date:iso,amount:action==='paid'?m.dailySavings:0,status:action,note:'Bulk update',recorded_by:'Admin'}));
+ const {error}=await supabaseClient.from('payments').upsert(rows,{onConflict:'member_id,payment_date'});
+ if(error){console.error(error);toast('error','alertTri',error.message||'Could not save bulk payments.');return;}state.calSelecting=false;state.calSelectedDates=new Set();await refreshSupabaseData();toast('success','checkCircle',`${dates.length} day${dates.length===1?'':'s'} marked as ${action}.`);go('member-profile',{selectedMemberId:memberId});
 }
 
 /* ---------- Withdrawals ---------- */
@@ -1848,38 +1831,15 @@ function openWithdrawModal(memberId){
     </div>
   `);
 }
-function confirmWithdraw(memberId){
-  const m=getMember(memberId);
-  const amtInput=document.getElementById('withdraw-amount');
-  const amount=parseFloat(amtInput.value);
-  const errEl=document.getElementById('err-withdraw');
-  if(!amount || amount<=0 || amount>m.totalSavings){
-    errEl.classList.remove('hidden');
-    amtInput.classList.add('error');
-    return;
-  }
-  errEl.classList.add('hidden');
-  const note=document.getElementById('withdraw-note').value;
-  const id=genId();
-  m.withdrawals[id]={
-    iso: isoDate(TODAY),
-    amount: amount,
-    note: note,
-    recordedBy:'Admin',
-    time: nowTimeStr()
-  };
-  recomputeMemberDerived(m);
-  closeModal();
-  toast('success','minusCircle',`${GHSshort(amount)} withdrawn from ${m.name}'s savings.`);
-  go('member-profile',{selectedMemberId:memberId});
+async function confirmWithdraw(memberId){
+ const m=getMember(memberId);if(!m)return;const input=document.getElementById('withdraw-amount');const amount=parseFloat(input.value);const err=document.getElementById('err-withdraw');if(!amount||amount<=0||amount>m.totalSavings){err.classList.remove('hidden');input.classList.add('error');return;}err.classList.add('hidden');const note=document.getElementById('withdraw-note').value.trim();
+ const {error}=await supabaseClient.from('withdrawals').insert({member_id:m.id,amount,withdrawal_date:isoDate(TODAY),note,recorded_by:'Admin'});if(error){console.error(error);toast('error','alertTri',error.message||'Could not record withdrawal.');return;}closeModal();await refreshSupabaseData();toast('success','minusCircle',`${GHSshort(amount)} withdrawn from ${m.name}'s savings.`);go('member-profile',{selectedMemberId:memberId});
 }
 
 function nowTimeStr(){const h=NOW.getHours(),mi='0'+NOW.getMinutes();return `${(h%12)||12}:${mi.slice(-2)} ${h>=12?'PM':'AM'}`;}
 
 function recomputeMemberDerived(m){
   const joinDaysAgo=Math.round((TODAY-m.dateJoined)/86400000);
-
-  // Tally deposit totals purely from the stored payment records.
   let totalDeposited=0, daysPaid=0, daysMissed=0;
   for(let i=0;i<=joinDaysAgo;i++){
     const iso=isoDate(addDays(TODAY,-i));
@@ -1890,17 +1850,11 @@ function recomputeMemberDerived(m){
     } else if(pay && pay.status==='skipped'){
       // skipped days aren't counted as paid or missed
     } else {
-      // explicit 'missed' record, or no record at all for a past day
       daysMissed++;
     }
   }
-
-  // Tally withdrawals.
   let totalWithdrawn=0;
   Object.keys(m.withdrawals).forEach(k=>{totalWithdrawn+=m.withdrawals[k].amount;});
-
-  // Current consecutive-miss streak: walk back from today until the most
-  // recent 'paid' day is found.
   let lastPaymentDate=null, missStreak=0;
   for(let i=0;i<=joinDaysAgo;i++){
     const day=addDays(TODAY,-i);
@@ -1909,7 +1863,6 @@ function recomputeMemberDerived(m){
     if(pay && pay.status==='paid'){ lastPaymentDate=day; break; }
     missStreak++;
   }
-
   m.totalDeposited=totalDeposited;
   m.totalWithdrawn=totalWithdrawn;
   m.totalSavings=totalDeposited-totalWithdrawn;
@@ -1944,7 +1897,6 @@ function render(){
     case 'members': html=pageMembers(); break;
     case 'add-member': html=pageAddMember(); break;
     case 'member-profile': html=pageMemberProfile(state.selectedMemberId); break;
-    case 'member-details': html=pageMemberDetails(state.selectedMemberId); break;
     case 'today': html=pageToday(); break;
     case 'reports': html=pageReports(); break;
     case 'notifications-page': html=pageNotificationsFull(); break;
@@ -1956,7 +1908,7 @@ function render(){
 /* =========================================================================
    EVENT DELEGATION
    ========================================================================= */
-document.addEventListener('click',function(e){
+document.addEventListener('click',async function(e){
   // nav items (sidebar + inline data-nav buttons)
   const navBtn=e.target.closest('[data-nav]');
   if(navBtn){
@@ -1977,14 +1929,17 @@ document.addEventListener('click',function(e){
   }
   if(e.target.closest('#notif-bell-btn')){
     document.getElementById('notif-dropdown').classList.toggle('hidden');
+    document.getElementById('user-dropdown').classList.add('hidden');
     return;
   }
   if(e.target.closest('#topbar-avatar-btn')){
+    document.getElementById('user-dropdown').classList.toggle('hidden');
     document.getElementById('notif-dropdown').classList.add('hidden');
     return;
   }
-  if(!e.target.closest('.dropdown-panel') && !e.target.closest('#notif-bell-btn')){
+  if(!e.target.closest('.dropdown-panel') && !e.target.closest('#topbar-avatar-btn') && !e.target.closest('.user-dropdown')){
     document.getElementById('notif-dropdown').classList.add('hidden');
+    document.getElementById('user-dropdown').classList.add('hidden');
   }
   if(e.target.closest('#hamburger-btn')){
     document.getElementById('sidebar').classList.add('open');
@@ -1992,7 +1947,28 @@ document.addEventListener('click',function(e){
     return;
   }
   if(e.target.closest('#sidebar-backdrop')){ closeSidebarMobile(); return; }
+  
+  // User dropdown items
+  if(e.target.closest('#user-profile-btn')){
+    document.getElementById('user-dropdown').classList.add('hidden');
+    openProfileModal();
+    return;
+  }
+  if(e.target.closest('#user-settings-btn')){
+    document.getElementById('user-dropdown').classList.add('hidden');
+    openSettingsModal();
+    return;
+  }
+  if(e.target.closest('#user-logout-btn')){
+    document.getElementById('user-dropdown').classList.add('hidden');
+    await supabaseClient.auth.signOut();MEMBERS=[];CURRENT_SESSION_USER=null;
+    document.getElementById('app-shell').classList.remove('active');
+    document.getElementById('login-view').style.display='grid';
+    return;
+  }
+  
   if(e.target.closest('#logout-btn')){
+    await supabaseClient.auth.signOut();MEMBERS=[];CURRENT_SESSION_USER=null;
     document.getElementById('app-shell').classList.remove('active');
     document.getElementById('login-view').style.display='grid';
     return;
@@ -2063,16 +2039,6 @@ document.addEventListener('click',function(e){
   const repChip=e.target.closest('[data-report-range]');
   if(repChip){ state.reportRange=repChip.getAttribute('data-report-range'); render(); return; }
 
-  // member profile page navigation
-  if(e.target.closest('#member-profile-jump')){
-    go('member-details',{selectedMemberId:state.selectedMemberId});
-    return;
-  }
-  if(e.target.closest('#member-details-calendar')){
-    go('member-profile',{selectedMemberId:state.selectedMemberId});
-    return;
-  }
-
   // edit member (placeholder toast)
   if(e.target.closest('#edit-member-btn')){ toast('success','info','Editing member details is available in the full release.'); return; }
 });
@@ -2122,7 +2088,7 @@ function closeSidebarMobile(){
 }
 
 /* Add member form submit */
-document.addEventListener('submit',function(e){
+document.addEventListener('submit',async function(e){
   if(e.target.id==='add-member-form'){
     e.preventDefault();
     const name=document.getElementById('f-name').value.trim();
@@ -2141,22 +2107,23 @@ document.addEventListener('submit',function(e){
     const daily=parseFloat(document.getElementById('f-daily').value)||20;
     const joined=new Date(document.getElementById('f-joined').value || isoDate(TODAY));
 
-    const newMember={
-      id: Math.max(...MEMBERS.map(m=>m.id))+1,
-      name, cardNumber:card, phone, address, dateJoined:joined,
-      dailySavings:daily, totalSavings:0, totalDeposited:0, totalWithdrawn:0, daysPaid:0, daysMissed:0, daysSkipped:0,
-      payments:{}, withdrawals:{}, paidToday:false, lastPaymentDate:null, missStreak:0, status:'Active'
-    };
-    MEMBERS.unshift(newMember);
+    const {error}=await supabaseClient.from('members').insert({name,card_number:card,phone,address,date_joined:isoDate(joined),daily_savings:daily,status:'Active'});
+    if(error){console.error(error);toast('error','alertTri',error.message||'Could not register member.');return;}
+    await refreshSupabaseData();
     toast('success','checkCircle',`${name} registered successfully.`);
     go('members');
   }
 
   if(e.target.id==='login-form'){
     e.preventDefault();
-    document.getElementById('login-view').style.display='none';
-    document.getElementById('app-shell').classList.add('active');
-    go('dashboard');
+    const email=document.getElementById('login-email').value.trim(),password=document.getElementById('login-password').value,btn=e.target.querySelector('button[type="submit"]');
+    btn.disabled=true;btn.textContent='Signing in…';
+    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+    btn.disabled=false;btn.textContent='Sign In';
+    if(error){console.error(error);toast('error','xCircle',error.message||'Sign in failed.');return;}
+    CURRENT_SESSION_USER = data?.user || null;
+    if(!await refreshSupabaseData()){await supabaseClient.auth.signOut();CURRENT_SESSION_USER=null;return;}
+    document.getElementById('login-view').style.display='none';document.getElementById('app-shell').classList.add('active');go('dashboard');
   }
 });
 
@@ -2172,20 +2139,24 @@ document.getElementById('pw-toggle-btn').innerHTML=icon('eye',17);
 /* ---------- login left decorative bits ---------- */
 document.getElementById('login-logo-slot').innerHTML=`${logoMark(40)}<div><div class="brand-name" style="font-size:18px;">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div>`;
 document.getElementById('login-security-note').innerHTML=`${icon('shieldCheck',15)} Secured admin access · Limol's Microfinance`;
-(function(){
-  const w=weeklySeries();
-  const max=Math.max(...w.vals,1);
-  const pts=w.vals.map((v,i)=>`${(i/(w.vals.length-1))*280},${60-(v/max)*54}`).join(' ');
-  document.getElementById('login-growth-chart').innerHTML=`
-  <div style="font-size:11px;color:#8393B4;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">This week's collections</div>
-  <svg width="280" height="70" viewBox="0 0 280 70" fill="none">
-    <polyline points="${pts}" fill="none" stroke="#7EB0FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <polyline points="0,66 ${pts} 280,66" fill="rgba(126,176,255,0.12)" stroke="none"/>
-  </svg>`;
-})();
 
 /* ---------- init ---------- */
-render();
+(async function initSupabase(){
+  try{
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    if(session){
+      CURRENT_SESSION_USER = session.user;
+      if(await refreshSupabaseData()){
+        document.getElementById('login-view').style.display='none';
+        document.getElementById('app-shell').classList.add('active');
+      } else {
+        await supabaseClient.auth.signOut();
+        CURRENT_SESSION_USER=null;
+      }
+    }
+  }catch(err){console.error('Supabase initialization failed:',err);}
+  render();
+})();
 </script>
 </body>
 </html>
