@@ -354,7 +354,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   aspect-ratio:1/0.92;border-radius:10px;border:1px solid var(--gray-200);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   background:var(--gray-25);cursor:pointer;transition:box-shadow .15s,border-color .15s;position:relative;
-  padding:4px 2px;
+  padding:4px 2px;min-width:0;overflow:hidden;
 }
 .cal-cell:hover{box-shadow:var(--shadow-sm);}
 .cal-cell.empty{background:transparent;border:none;cursor:default;}
@@ -375,7 +375,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .cal-cell.skipped .cal-daynum{color:var(--gray-500);}
 .cal-status-icon{margin-top:8px;}
 .cal-status-text{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.02em;margin-top:1px;}
-.cal-amount{font-family:var(--font-mono);font-size:10.5px;font-weight:700;margin-top:1px;}
+.cal-amount{font-family:var(--font-mono);font-size:10.5px;font-weight:700;margin-top:1px;white-space:nowrap;}
 .cal-cell.paid .cal-status-text,.cal-cell.paid .cal-amount{color:var(--green-700);}
 .cal-cell.missed .cal-status-text{color:var(--red-700);}
 .cal-cell.skipped .cal-status-text{color:var(--gray-500);}
@@ -533,9 +533,10 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   .summary-cards{grid-template-columns:1fr 1fr;gap:8px;}
   .summary-card{padding:12px 13px;}
   .summary-card .val{font-size:16px;}
+  .card-pad{padding:14px;}
   .cal-grid{gap:3px;}
   .cal-status-text{display:none;}
-  .cal-amount{font-size:9px;}
+  .cal-amount{font-size:8.5px;}
   .cal-daynum{position:static;margin-bottom:2px;}
   .cal-cell{padding:4px 1px;}
   .dropdown-panel{right:10px;left:10px;width:auto;top:52px;}
@@ -547,9 +548,8 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
   tbody td{border-bottom:none;padding:5px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   tbody td::before{content:attr(data-label);font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;}
   .profile-header{flex-direction:column;align-items:flex-start;}
-  .profile-header-actions{width:100%;}
-  .profile-header-actions .btn{flex:1;}
-  .action-buttons{grid-template-columns:1fr;}
+  .profile-header-actions{width:100%;flex-direction:column;}
+  .profile-header-actions .btn{width:100%;}
   .toolbar{gap:8px;}
   .search-box{max-width:100%;min-width:100%;}
   .select-box select{width:100%;}
@@ -863,6 +863,7 @@ const state={
   profileCalYear:TODAY.getFullYear(),
   historyFilter:'all',
   historyPage:1,
+  historyExpanded:false,
   reportRange:'week',
   calSelecting:false,
   calSelectedDates:new Set(),
@@ -1341,49 +1342,87 @@ function renderCalendarCard(m){
   `;
 }
 
-function historyEntries(m){
+function allHistoryEntries(m){
   const dEntries=Object.keys(m.payments).map(iso=>({iso,type:'deposit',amount:m.payments[iso].amount,note:m.payments[iso].note,recordedBy:m.payments[iso].recordedBy,status:m.payments[iso].status}));
   const wEntries=Object.keys(m.withdrawals).map(key=>{const w=m.withdrawals[key];return {iso:w.iso,type:'withdrawal',amount:w.amount,note:w.note,recordedBy:w.recordedBy,status:'withdrawn'};});
   let entries=dEntries.concat(wEntries);
   entries.sort((a,b)=> a.iso<b.iso?1:a.iso>b.iso?-1:0);
-  if(state.historyFilter==='month') entries=entries.filter(e=>e.iso.slice(0,7)===isoDate(TODAY).slice(0,7));
-  if(state.historyFilter==='week') entries=entries.filter(e=> new Date(e.iso) >= addDays(TODAY,-7));
   return entries;
 }
+
+function historyRowMeta(e){
+  const isPaid=e.status==='paid', isSkipped=e.status==='skipped', isWithdrawal=e.type==='withdrawal';
+  const typeLabel= isWithdrawal?'Withdrawal':'Daily Savings';
+  const sign= isPaid?'+': isWithdrawal?'-':'';
+  const amtColor= isPaid?'color:var(--green-700);font-weight:600;': isSkipped?'color:var(--gray-500);': isWithdrawal?'color:var(--orange-600);font-weight:600;':'color:var(--red-600);font-weight:600;';
+  const badge= isPaid?'<span class="badge badge-green">Completed</span>'
+              : isSkipped?'<span class="badge badge-gray">Skipped</span>'
+              : isWithdrawal?'<span class="badge badge-orange">Withdrawn</span>'
+              : '<span class="badge badge-red">Missed</span>';
+  const rowIconBg = isPaid?'var(--green-50)': isWithdrawal?'var(--orange-50)': isSkipped?'var(--gray-100)':'var(--red-50)';
+  const rowIconColor = isPaid?'var(--green-700)': isWithdrawal?'var(--orange-600)': isSkipped?'var(--gray-600)':'var(--red-600)';
+  const rowIconName = isPaid?'checkCircle': isWithdrawal?'minusCircle': isSkipped?'minus':'xCircle';
+  return {typeLabel,sign,amtColor,badge,rowIconBg,rowIconColor,rowIconName};
+}
+
 function renderHistoryCard(m){
-  const entries=historyEntries(m);
+  return state.historyExpanded ? renderHistoryExpanded(m) : renderHistoryCompact(m);
+}
+
+function renderHistoryCompact(m){
+  const entries=allHistoryEntries(m);
+  const recent=entries.slice(0,3);
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+      <h3 class="section-title">Savings History</h3>
+      ${entries.length>3?`<button class="btn btn-secondary btn-sm" id="hist-view-full">View Full History ${icon('chevRight',13)}</button>`:''}
+    </div>
+    ${recent.length===0? `<div class="empty-state"><div>${icon('fileText',36,1.5)}</div><h4>No transactions found</h4><p>No savings recorded yet for this member.</p></div>` :
+    recent.map(e=>{
+      const meta=historyRowMeta(e);
+      return `
+      <div class="list-row" style="cursor:default;">
+        <div class="member-photo" style="width:38px;height:38px;background:${meta.rowIconBg};color:${meta.rowIconColor};">${icon(meta.rowIconName,17)}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="list-row-name">${meta.typeLabel}</div>
+          <div class="list-row-meta">${fmtDateLong(new Date(e.iso))} &middot; ${e.recordedBy||'Admin'}</div>
+        </div>
+        <div class="list-row-right">
+          <div class="list-row-amount num" style="${meta.amtColor}">${meta.sign}${GHSshort(e.amount||0)}</div>
+          <div class="list-row-time">${meta.badge}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function renderHistoryExpanded(m){
+  const cutoff=addDays(TODAY,-30);
+  const entries=allHistoryEntries(m).filter(e=> new Date(e.iso) >= cutoff);
   const perPage=8;
   const totalPages=Math.max(1,Math.ceil(entries.length/perPage));
   const page=Math.min(state.historyPage,totalPages);
   const pageEntries=entries.slice((page-1)*perPage,page*perPage);
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-      <h3 class="section-title">Savings History</h3>
-      <div class="hist-filters">
-        <button class="chip ${state.historyFilter==='all'?'active':''}" data-hist-filter="all">All</button>
-        <button class="chip ${state.historyFilter==='month'?'active':''}" data-hist-filter="month">This Month</button>
-        <button class="chip ${state.historyFilter==='week'?'active':''}" data-hist-filter="week">This Week</button>
+      <div>
+        <h3 class="section-title">Savings History</h3>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">Showing the last 30 days</div>
       </div>
+      <button class="btn btn-secondary btn-sm" id="hist-show-recent">${icon('chevLeft',13)} Show Recent</button>
     </div>
-    ${entries.length===0? `<div class="empty-state"><div>${icon('fileText',36,1.5)}</div><h4>No transactions found</h4><p>No savings recorded for this filter.</p></div>` : `
+    ${entries.length===0? `<div class="empty-state"><div>${icon('fileText',36,1.5)}</div><h4>No transactions found</h4><p>No savings recorded in the last 30 days.</p></div>` : `
     <div class="table-wrap"><table>
       <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th><th>Recorded By</th></tr></thead>
       <tbody>
       ${pageEntries.map(e=>{
-        const isPaid=e.status==='paid', isSkipped=e.status==='skipped', isWithdrawal=e.type==='withdrawal';
-        const amtColor= isPaid?'color:var(--green-700);font-weight:600;': isSkipped?'color:var(--gray-500);': 'color:var(--red-600);font-weight:600;';
-        const sign= isPaid?'+': isWithdrawal?'-':'';
-        const typeLabel= isWithdrawal?'Withdrawal':'Daily Savings';
-        const badge= isPaid?'<span class="badge badge-green">Completed</span>'
-                    : isSkipped?'<span class="badge badge-gray">Skipped</span>'
-                    : isWithdrawal?'<span class="badge badge-orange">Withdrawn</span>'
-                    : '<span class="badge badge-red">Missed</span>';
+        const meta=historyRowMeta(e);
         return `
         <tr>
           <td data-label="Date">${fmtDateLong(new Date(e.iso))}</td>
-          <td data-label="Type">${typeLabel}</td>
-          <td data-label="Amount" class="num" style="${amtColor}">${sign}${GHSshort(e.amount||0)}</td>
-          <td data-label="Status">${badge}</td>
+          <td data-label="Type">${meta.typeLabel}</td>
+          <td data-label="Amount" class="num" style="${meta.amtColor}">${meta.sign}${GHSshort(e.amount||0)}</td>
+          <td data-label="Status">${meta.badge}</td>
           <td data-label="Recorded By">${e.recordedBy||'Admin'}</td>
         </tr>`;}).join('')}
       </tbody>
@@ -2066,7 +2105,7 @@ document.addEventListener('click',async function(e){
   if(gotoMember){
     const id=Number(gotoMember.getAttribute('data-goto-member'));
     state.profileCalMonth=TODAY.getMonth(); state.profileCalYear=TODAY.getFullYear();
-    state.historyFilter='all'; state.historyPage=1;
+    state.historyFilter='all'; state.historyPage=1; state.historyExpanded=false;
     state.calSelecting=false; state.calSelectedDates=new Set();
     go('member-profile',{selectedMemberId:id});
     return;
@@ -2182,9 +2221,17 @@ document.addEventListener('click',async function(e){
   const confirmBtn=e.target.closest('#confirm-payment-btn');
   if(confirmBtn){ confirmPayment(Number(confirmBtn.getAttribute('data-member')),confirmBtn.getAttribute('data-date')); return; }
 
-  // history filters
-  const histChip=e.target.closest('[data-hist-filter]');
-  if(histChip){ state.historyFilter=histChip.getAttribute('data-hist-filter'); state.historyPage=1; document.getElementById('history-card').innerHTML=renderHistoryCard(getMember(state.selectedMemberId)); return; }
+  // history: view full history / show recent toggle
+  if(e.target.closest('#hist-view-full')){
+    state.historyExpanded=true; state.historyPage=1;
+    document.getElementById('history-card').innerHTML=renderHistoryCard(getMember(state.selectedMemberId));
+    return;
+  }
+  if(e.target.closest('#hist-show-recent')){
+    state.historyExpanded=false; state.historyPage=1;
+    document.getElementById('history-card').innerHTML=renderHistoryCard(getMember(state.selectedMemberId));
+    return;
+  }
   if(e.target.closest('#hist-prev')){ state.historyPage=Math.max(1,state.historyPage-1); document.getElementById('history-card').innerHTML=renderHistoryCard(getMember(state.selectedMemberId)); return; }
   if(e.target.closest('#hist-next')){ state.historyPage=state.historyPage+1; document.getElementById('history-card').innerHTML=renderHistoryCard(getMember(state.selectedMemberId)); return; }
 
