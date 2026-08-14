@@ -767,9 +767,8 @@ function logoImg(size=34,extraClass=''){
   return `<img src="${LOGO_DATA_URI}" alt="Limol's Microfinance logo" class="${extraClass}" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${Math.round(size*0.22)}px;background:#fff;padding:${Math.max(2,Math.round(size*0.08))}px;flex-shrink:0;"/>`;
 }
 function brandBlock(dark){
- document.getElementById('login-logo-slot').innerHTML=`${logoImg(64)}<div><div class="brand-name" style="font-size:19px;">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div>`;
+  return `<div class="brand-logo ${dark?'dark':''}">${logoImg(64)}<div><div class="brand-name">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div></div>`;
 }
-
 /* ---------- avatar helper ---------- */
 const AV_COLORS = ['#28548F','#178A5A','#DB7A2C','#6C5FC4','#C24E6E','#1C8FA8','#8A6D1C','#4E5768'];
 function initialsOf(name){const p=name.trim().split(/\s+/);return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
