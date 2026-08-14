@@ -504,12 +504,12 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
 .login-left-logo-row{display:flex;align-items:center;gap:12px;}
 .login-left-logo-img{width:44px;height:44px;border-radius:10px;object-fit:contain;background:#fff;padding:4px;flex-shrink:0;}
 .login-mobile-logo-wrap{display:none;flex-direction:column;align-items:center;text-align:center;margin-bottom:22px;}
-.login-mobile-logo-wrap img{width:250px;height:250px;object-fit:contain;margin-bottom:12px;}
+.login-mobile-logo-wrap img{width:64px;height:64px;object-fit:contain;margin-bottom:10px;}
 .login-mobile-logo-wrap .brand-name{color:var(--gray-900);font-size:16px;}
 .login-mobile-logo-wrap .brand-sub{color:var(--gray-500);}
 
 /* Sidebar logo image */
-.sidebar-brand .brand-logo img{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;padding:4px;flex-shrink:0;}
+.sidebar-brand .brand-logo img{width:34px;height:34px;border-radius:8px;object-fit:contain;background:#fff;padding:3px;flex-shrink:0;}
 
 /* Fade-in animation for login page */
 @keyframes fadeInUp{
@@ -767,7 +767,7 @@ function logoImg(size=34,extraClass=''){
   return `<img src="${LOGO_DATA_URI}" alt="Limol's Microfinance logo" class="${extraClass}" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:${Math.round(size*0.22)}px;background:#fff;padding:${Math.max(2,Math.round(size*0.08))}px;flex-shrink:0;"/>`;
 }
 function brandBlock(dark){
- document.getElementById('login-logo-slot').innerHTML=`${logoImg(64)}<div><div class="brand-name" style="font-size:19px;">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div>`;
+  return `<div class="brand-logo ${dark?'dark':''}">${logoImg(34)}<div><div class="brand-name">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div></div>`;
 }
 
 /* ---------- avatar helper ---------- */
@@ -2356,7 +2356,7 @@ document.getElementById('pw-toggle-btn').addEventListener('click',function(){
 document.getElementById('pw-toggle-btn').innerHTML=icon('eye',17);
 
 /* ---------- login left decorative bits ---------- */
-document.getElementById('login-logo-slot').innerHTML=`${logoImg(64)}<div><div class="brand-name" style="font-size:19px;">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div>`;
+document.getElementById('login-logo-slot').innerHTML=`${logoImg(40)}<div><div class="brand-name" style="font-size:18px;">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div></div>`;
 document.getElementById('login-mobile-logo-wrap').innerHTML=`<img src="${LOGO_DATA_URI}" alt="Limol's Microfinance logo"/><div class="brand-name">Limol's Microfinance</div><div class="brand-sub">Savings Administration</div>`;
 document.getElementById('login-security-note').innerHTML=`${icon('shieldCheck',15)} Secured admin access · Limol's Microfinance`;
 
