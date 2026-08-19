@@ -2146,10 +2146,12 @@ function openPaymentModal(memberId, dateIso) {
         </div>
       </div>
 
-      <div class="field" id="amount-field" style="${status === 'paid' ? '' : 'display:none;'}">
+          <div class="field" id="amount-field" style="${status === 'paid' ? '' : 'display:none;'}">
         <label>Amount Paid</label>
-        <div class="input-prefix-wrap"><span class="input-prefix">GH₵</span><input type="number" id="pay-amount" value="${existing && existing.status === 'paid' ? existing.amount : m.dailySavings}" step="0.5"/></div>
+        <div class="input-prefix-wrap"><span class="input-prefix">GH₵</span><input type="number" id="pay-amount" min="0.01" step="0.5" value="${existing && existing.status === 'paid' ? existing.amount : m.dailySavings}"/></div>
+        <div class="error-msg hidden" id="err-pay-amount">${icon('alertTri', 12)} Enter an amount greater than zero</div>
       </div>
+
       <div class="field">
         <label>Note <span style="color:var(--gray-400);font-weight:500;">(optional)</span></label>
         <textarea id="pay-note" rows="2" placeholder="Payment note...">${existing ? existing.note || '' : ''}</textarea>
@@ -2190,15 +2192,44 @@ function openPaymentModal(memberId, dateIso) {
 }
 
 async function confirmPayment(memberId, iso) {
+  const btn = document.getElementById('confirm-payment-btn');
+  if (!btn || btn.disabled) return; // guards against double-click / double-submit
+  btn.disabled = true;
+
   const m = getMember(memberId);
-  if (!m) return;
+  if (!m) { btn.disabled = false; return; }
+
   const body = document.querySelector('.modal-body');
   const action = body ? body.dataset.selectedAction || 'paid' : 'paid';
   const amount = action === 'paid' ? parseFloat(document.getElementById('pay-amount').value) || m.dailySavings : 0;
+  const amtInput = document.getElementById('pay-amount');
+  const amtErr = document.getElementById('err-pay-amount');
+
+  if (action === 'paid' && (!amount || amount <= 0)) {
+    amtErr?.classList.remove('hidden');
+    amtInput?.classList.add('error');
+    btn.disabled = false;
+    return;
+  }
+  amtErr?.classList.add('hidden');
+  amtInput?.classList.remove('error');
+
   const note = document.getElementById('pay-note').value.trim();
-  const { error } = await supabaseClient.from('payments').upsert({ member_id: m.id, payment_date: iso, amount, status: action, note, recorded_by: 'Admin' }, { onConflict: 'member_id,payment_date' });
-  if (error) { console.error(error);
-    toast('error', 'alertTri', error.message || 'Could not save payment.'); return; }
+  const originalLabel = btn.innerHTML;
+  btn.innerHTML = `${icon('checkCircle', 15)} Saving...`;
+
+  const { error } = await supabaseClient.from('payments').upsert(
+    { member_id: m.id, payment_date: iso, amount, status: action, note, recorded_by: getCurrentUserName() },
+    { onConflict: 'member_id,payment_date' }
+  );
+
+  if (error) {
+    console.error(error);
+    toast('error', 'alertTri', error.message || 'Could not save payment.');
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+    return;
+  }
   if (action === 'paid') {
     SMS.notifyDeposit(m, amount, iso, note).catch(err => console.error('SMS deposit notify failed:', err));
   }
@@ -2209,13 +2240,29 @@ async function confirmPayment(memberId, iso) {
 }
 
 async function applyBulkAction(memberId, action) {
+  const bulkButtons = document.querySelectorAll('#bulk-mark-paid,#bulk-mark-skipped,#bulk-mark-missed');
+  if (bulkButtons.length && bulkButtons[0].disabled) return; // guards against double-click
+  bulkButtons.forEach(b => { b.disabled = true; });
+
   const m = getMember(memberId),
     dates = Array.from(state.calSelectedDates);
-  if (!m || dates.length === 0) return;
-  const rows = dates.map(iso => ({ member_id: m.id, payment_date: iso, amount: action === 'paid' ? m.dailySavings : 0, status: action, note: 'Bulk update', recorded_by: 'Admin' }));
+  if (!m || dates.length === 0) {
+    bulkButtons.forEach(b => { b.disabled = false; });
+    return;
+  }
+
+  const rows = dates.map(iso => ({
+    member_id: m.id, payment_date: iso, amount: action === 'paid' ? m.dailySavings : 0,
+    status: action, note: 'Bulk update', recorded_by: getCurrentUserName()
+  }));
   const { error } = await supabaseClient.from('payments').upsert(rows, { onConflict: 'member_id,payment_date' });
-  if (error) { console.error(error);
-    toast('error', 'alertTri', error.message || 'Could not save bulk payments.'); return; }
+
+  if (error) {
+    console.error(error);
+    toast('error', 'alertTri', error.message || 'Could not save bulk payments.');
+    bulkButtons.forEach(b => { b.disabled = false; });
+    return;
+  }
   if (action === 'paid') {
     const deposits = dates.map(iso => ({ date: iso, amount: m.dailySavings }));
     SMS.notifyBulkDeposits(m, deposits).catch(err => console.error('SMS bulk notify failed:', err));
@@ -2252,18 +2299,41 @@ function openWithdrawModal(memberId) {
 }
 
 async function confirmWithdraw(memberId) {
+  const btn = document.getElementById('confirm-withdraw-btn');
+  if (!btn || btn.disabled) return; // guards against double-click / double-submit
+  btn.disabled = true;
+
   const m = getMember(memberId);
-  if (!m) return;
+  if (!m) { btn.disabled = false; return; }
+
   const input = document.getElementById('withdraw-amount');
   const amount = parseFloat(input.value);
   const err = document.getElementById('err-withdraw');
-  if (!amount || amount <= 0 || amount > m.totalSavings) { err.classList.remove('hidden');
-    input.classList.add('error'); return; }
+
+  if (!amount || amount <= 0 || amount > m.totalSavings) {
+    err.classList.remove('hidden');
+    input.classList.add('error');
+    btn.disabled = false;
+    return;
+  }
   err.classList.add('hidden');
+  input.classList.remove('error');
+
   const note = document.getElementById('withdraw-note').value.trim();
-  const { error } = await supabaseClient.from('withdrawals').insert({ member_id: m.id, amount, withdrawal_date: isoDate(TODAY), note, recorded_by: 'Admin' });
-  if (error) { console.error(error);
-    toast('error', 'alertTri', error.message || 'Could not record withdrawal.'); return; }
+  const originalLabel = btn.innerHTML;
+  btn.innerHTML = `${icon('minusCircle', 15)} Withdrawing...`;
+
+  const { error } = await supabaseClient.from('withdrawals').insert({
+    member_id: m.id, amount, withdrawal_date: isoDate(TODAY), note, recorded_by: getCurrentUserName()
+  });
+
+  if (error) {
+    console.error(error);
+    toast('error', 'alertTri', error.message || 'Could not record withdrawal.');
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+    return;
+  }
   SMS.notifyWithdrawal(m, amount, isoDate(TODAY), note).catch(err => console.error('SMS withdrawal notify failed:', err));
   closeModal();
   await refreshSupabaseData();
@@ -2564,6 +2634,11 @@ document.addEventListener('input', function(e) {
     e.target.classList.remove('error');
     return;
   }
+  if (e.target.id === 'pay-amount') {
+    document.getElementById('err-pay-amount')?.classList.add('hidden');
+    e.target.classList.remove('error');
+    return;
+  }
 });
 
 function renderMembersListOnly() {
@@ -2589,10 +2664,12 @@ function closeSidebarMobile() {
   document.getElementById('sidebar-backdrop').classList.remove('active');
 }
 
-/* Add member form submit */
 document.addEventListener('submit', async function(e) {
   if (e.target.id === 'add-member-form') {
     e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (!submitBtn || submitBtn.disabled) return; // guards against double-click / double-submit
+
     const name = document.getElementById('f-name').value.trim();
     const phone = document.getElementById('f-phone').value.trim();
     let ok = true;
@@ -2605,14 +2682,23 @@ document.addEventListener('submit', async function(e) {
     if (!phoneValid) ok = false;
     if (!ok) { toast('error', 'xCircle', 'Please fix the highlighted fields.'); return; }
 
+    submitBtn.disabled = true;
+    const originalLabel = submitBtn.innerHTML;
+    submitBtn.innerHTML = `${icon('checkCircle', 16)} Registering...`;
+
     const card = document.getElementById('f-card').value.trim();
     const address = document.getElementById('f-address').value.trim() || 'Not provided';
     const daily = parseFloat(document.getElementById('f-daily').value) || 20;
     const joined = new Date(document.getElementById('f-joined').value || isoDate(TODAY));
 
     const { error } = await supabaseClient.from('members').insert({ name, card_number: card, phone, address, date_joined: isoDate(joined), daily_savings: daily, status: 'Active' });
-    if (error) { console.error(error);
-      toast('error', 'alertTri', error.message || 'Could not register member.'); return; }
+    if (error) {
+      console.error(error);
+      toast('error', 'alertTri', error.message || 'Could not register member.');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalLabel;
+      return;
+    }
     await refreshSupabaseData();
     toast('success', 'checkCircle', `${name} registered successfully.`);
     go('members');
