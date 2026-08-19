@@ -788,6 +788,16 @@ function GHS(n) { return 'GH₵ ' + n.toLocaleString('en-GH', { minimumFractionD
 
 function GHSshort(n) { return 'GH₵' + n.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -1029,12 +1039,12 @@ async function loadSupabaseData() {
     };
   });
 
-  MEMBERS = (membersRes.data || []).map(row => ({
+ MEMBERS = (membersRes.data || []).map(row => ({
     id: Number(row.id),
-    name: row.name,
+    name: esc(row.name),
     cardNumber: row.card_number,
-    phone: row.phone,
-    address: row.address || '',
+    phone: esc(row.phone),
+    address: esc(row.address || ''),
     dateJoined: dbDateToLocal(row.date_joined),
     dailySavings: Number(row.daily_savings) || 0,
     status: row.status || 'Active',
