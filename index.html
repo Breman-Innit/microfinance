@@ -1015,8 +1015,8 @@ async function loadSupabaseData() {
       id: Number(row.id),
       amount: Number(row.amount) || 0,
       time: timeFromCreatedAt(row.created_at),
-      recordedBy: row.recorded_by || 'Admin',
-      note: row.note || '',
+      recordedBy: esc(row.recorded_by || 'Admin'),
+      note: esc(row.note || ''),
       status: row.status,
       smsStatus: row.sms_status || 'not_sent',
       smsError: row.sms_error || null
@@ -1027,19 +1027,19 @@ async function loadSupabaseData() {
   (withdrawalsRes.data || []).forEach(row => {
     const id = Number(row.member_id);
     if (!withdrawalsByMember[id]) withdrawalsByMember[id] = {};
-    withdrawalsByMember[id][String(row.id)] = {
+   withdrawalsByMember[id][String(row.id)] = {
       id: Number(row.id),
       iso: row.withdrawal_date,
       amount: Number(row.amount) || 0,
-      note: row.note || '',
-      recordedBy: row.recorded_by || 'Admin',
+      note: esc(row.note || ''),
+      recordedBy: esc(row.recorded_by || 'Admin'),
       time: timeFromCreatedAt(row.created_at),
       smsStatus: row.sms_status || 'not_sent',
       smsError: row.sms_error || null
     };
   });
 
- MEMBERS = (membersRes.data || []).map(row => ({
+MEMBERS = (membersRes.data || []).map(row => ({
     id: Number(row.id),
     name: esc(row.name),
     cardNumber: row.card_number,
@@ -1156,7 +1156,7 @@ function renderChrome() {
     btn.classList.toggle('active', state.route === key || (key === 'members' && (state.route === 'member-profile' || state.route === 'add-member')));
   });
 
-  const userName = getCurrentUserName();
+   const userName = esc(getCurrentUserName());
   document.getElementById('sidebar-user-slot').innerHTML = `${avatar(userName, 36)}<div><div class="sidebar-user-name">${userName}</div><div class="sidebar-user-role">Administrator</div></div>`;
   document.getElementById('logout-btn').innerHTML = `${icon('logout', 16)}<span>Log out</span>`;
   document.getElementById('hamburger-btn').innerHTML = icon('menu', 20);
@@ -1209,7 +1209,7 @@ function pageDashboard() {
   const expected = totalMembers;
   const notYet = expected - paidTodayCount;
   const pct = expected > 0 ? Math.round((paidTodayCount / expected) * 100) : 0;
-  const userName = getCurrentUserName();
+  const userName = esc(getCurrentUserName());
 
   return `
   <div>
@@ -1558,8 +1558,8 @@ function renderCalendarCard(m) {
       const statusIcon = (day < TODAY) ? 'xCircle' : 'clock';
       body = `<div class="cal-daynum">${day.getDate()}</div><div class="cal-status-icon">${icon(statusIcon, 14)}</div><div class="cal-status-text">${statusText}</div>`;
     }
-    if (isToday) cls += ' today';
-    if (state.calSelecting && !beforeJoin) {
+     if (isToday) cls += ' today';
+    if (state.calSelecting && !beforeJoin && !isFuture) {
       cls += ' selectable-mode';
       if (state.calSelectedDates.has(iso)) cls += ' selected';
       body += `<div class="cal-select-check">${icon('checkCircle', 11, 2.4)}</div>`;
@@ -1911,8 +1911,8 @@ function openModal(html) {
 function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
 
 function openProfileModal() {
-  const userName = getCurrentUserName();
-  const userEmail = getCurrentUserEmail();
+  const userName = esc(getCurrentUserName());
+  const userEmail = esc(getCurrentUserEmail());
   const user = getCurrentUser();
   const joined = user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
 
@@ -1938,7 +1938,7 @@ function openProfileModal() {
 }
 
 function openSettingsModal() {
-  const currentName = getCurrentUserName();
+  const currentName = esc(getCurrentUserName());
   openModal(`
     <div class="modal-head"><h3>⚙️ Settings</h3><button class="modal-close" id="modal-close-btn">${icon('x', 15)}</button></div>
     <div class="modal-body">
@@ -2295,7 +2295,7 @@ async function applyBulkAction(memberId, action) {
   bulkButtons.forEach(b => { b.disabled = true; });
 
   const m = getMember(memberId),
-    dates = Array.from(state.calSelectedDates);
+    dates = Array.from(state.calSelectedDates).filter(iso => iso <= isoDate(TODAY));
   if (!m || dates.length === 0) {
     bulkButtons.forEach(b => { b.disabled = false; });
     return;
@@ -2599,6 +2599,7 @@ document.addEventListener('click', async function(e) {
     const memberId = Number(calCell.getAttribute('data-member'));
     const iso = calCell.getAttribute('data-cal-date');
     if (state.calSelecting) {
+      if (iso > isoDate(TODAY)) return; // block future-date selection in bulk mode
       if (state.calSelectedDates.has(iso)) state.calSelectedDates.delete(iso);
       else state.calSelectedDates.add(iso);
       document.getElementById('calendar-card').innerHTML = renderCalendarCard(getMember(memberId));
