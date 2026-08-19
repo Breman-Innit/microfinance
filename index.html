@@ -1404,13 +1404,13 @@ function pageAddMember() {
           <input type="text" id="f-name" placeholder="e.g. Kwame Mensah" required/>
           <div class="error-msg hidden" id="err-name">${icon('alertTri', 12)} Full name is required</div>
         </div>
-             <div class="field">
+                         <div class="field">
           <label>Card / Member Number <span class="req">*</span></label>
-          <input type="text" id="f-card" value="${MEMBERS.length + 1}" required/>
-          <div class="helper">Auto-generated — you can edit it.</div>
+          <input type="text" id="f-card" value="${nextMemberNumber()}" readonly style="background:var(--gray-50);color:var(--gray-600);cursor:not-allowed;"/>
+          <div class="helper">Auto-generated — assigned automatically, cannot be edited.</div>
           <div class="error-msg hidden" id="err-card">${icon('alertTri', 12)} This card number is already in use</div>
         </div>
-      </div>
+        </div>
       <div class="field-row">
         <div class="field">
           <label>Phone Number <span class="req">*</span></label>
@@ -1456,6 +1456,15 @@ function pageAddMember() {
    ========================================================================= */
 function getMember(id) { return MEMBERS.find(m => m.id === Number(id)); }
 
+
+function nextMemberNumber() {
+  let max = 0;
+  MEMBERS.forEach(m => {
+    const n = parseInt(m.cardNumber, 10);
+    if (!Number.isNaN(n) && String(n) === m.cardNumber.trim() && n > max) max = n;
+  });
+  return max + 1;
+}
 function pageMemberProfile(id) {
   const m = getMember(id);
   if (!m) return emptyState('users', 'Member not found', 'This member may have been removed.', 'members', 'Back to Members');
