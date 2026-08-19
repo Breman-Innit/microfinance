@@ -927,7 +927,6 @@ const SMS = {
         const message = `Limol's Microfinance: A withdrawal of ${GHSshort(amount)} was made from your savings account on ${dateStr}. Thank you for banking with us!`;
         return await this.send(member.phone, message);
     },
-
     async notifyBulkDeposits(member, deposits) {
         if (!member || !member.phone || deposits.length === 0) {
             return { success: false, error: 'Invalid data for bulk notification' };
@@ -944,6 +943,43 @@ const SMS = {
         return await this.send(member.phone, message);
     }
 };
+
+/* ---------- SMS delivery result tracking ---------- */
+function trackSmsResult(table, rowId, smsPromise, failureMessage) {
+  smsPromise.then(async (result) => {
+    if (!rowId) return;
+    const smsStatus = result.success ? 'sent' : 'failed';
+    const smsError = result.success ? null : (result.error || 'Unknown error');
+    try {
+      await supabaseClient.from(table).update({ sms_status: smsStatus, sms_error: smsError }).eq('id', rowId);
+    } catch (err) {
+      console.error('Failed to record SMS status:', err);
+    }
+    if (!result.success) {
+      toast('error', 'alertTri', failureMessage || 'SMS notification failed to send.');
+      await refreshSupabaseData();
+      if (state.route === 'member-profile') render();
+    }
+  }).catch(err => console.error('SMS tracking error:', err));
+}
+
+function trackSmsResultBulk(table, rowIds, smsPromise, failureMessage) {
+  smsPromise.then(async (result) => {
+    if (!rowIds || rowIds.length === 0) return;
+    const smsStatus = result.success ? 'sent' : 'failed';
+    const smsError = result.success ? null : (result.error || 'Unknown error');
+    try {
+      await supabaseClient.from(table).update({ sms_status: smsStatus, sms_error: smsError }).in('id', rowIds);
+    } catch (err) {
+      console.error('Failed to record bulk SMS status:', err);
+    }
+    if (!result.success) {
+      toast('error', 'alertTri', failureMessage || 'SMS notification failed to send.');
+      await refreshSupabaseData();
+      if (state.route === 'member-profile') render();
+    }
+  }).catch(err => console.error('SMS tracking error:', err));
+}
 
 let MEMBERS = [];
 
@@ -971,7 +1007,9 @@ async function loadSupabaseData() {
       time: timeFromCreatedAt(row.created_at),
       recordedBy: row.recorded_by || 'Admin',
       note: row.note || '',
-      status: row.status
+      status: row.status,
+      smsStatus: row.sms_status || 'not_sent',
+      smsError: row.sms_error || null
     };
   });
 
@@ -985,7 +1023,9 @@ async function loadSupabaseData() {
       amount: Number(row.amount) || 0,
       note: row.note || '',
       recordedBy: row.recorded_by || 'Admin',
-      time: timeFromCreatedAt(row.created_at)
+      time: timeFromCreatedAt(row.created_at),
+      smsStatus: row.sms_status || 'not_sent',
+      smsError: row.sms_error || null
     };
   });
 
@@ -1354,10 +1394,11 @@ function pageAddMember() {
           <input type="text" id="f-name" placeholder="e.g. Kwame Mensah" required/>
           <div class="error-msg hidden" id="err-name">${icon('alertTri', 12)} Full name is required</div>
         </div>
-        <div class="field">
+             <div class="field">
           <label>Card / Member Number <span class="req">*</span></label>
           <input type="text" id="f-card" value="${MEMBERS.length + 1}" required/>
           <div class="helper">Auto-generated — you can edit it.</div>
+          <div class="error-msg hidden" id="err-card">${icon('alertTri', 12)} This card number is already in use</div>
         </div>
       </div>
       <div class="field-row">
@@ -1554,8 +1595,8 @@ function renderCalendarCard(m) {
 }
 
 function allHistoryEntries(m) {
-  const dEntries = Object.keys(m.payments).map(iso => ({ iso, type: 'deposit', amount: m.payments[iso].amount, note: m.payments[iso].note, recordedBy: m.payments[iso].recordedBy, status: m.payments[iso].status }));
-  const wEntries = Object.keys(m.withdrawals).map(key => { const w = m.withdrawals[key]; return { iso: w.iso, type: 'withdrawal', amount: w.amount, note: w.note, recordedBy: w.recordedBy, status: 'withdrawn' }; });
+  const dEntries = Object.keys(m.payments).map(iso => ({ iso, type: 'deposit', amount: m.payments[iso].amount, note: m.payments[iso].note, recordedBy: m.payments[iso].recordedBy, status: m.payments[iso].status, smsStatus: m.payments[iso].smsStatus }));
+  const wEntries = Object.keys(m.withdrawals).map(key => { const w = m.withdrawals[key]; return { iso: w.iso, type: 'withdrawal', amount: w.amount, note: w.note, recordedBy: w.recordedBy, status: 'withdrawn', smsStatus: w.smsStatus }; });
   let entries = dEntries.concat(wEntries);
   entries.sort((a, b) => a.iso < b.iso ? 1 : a.iso > b.iso ? -1 : 0);
   return entries;
@@ -1596,9 +1637,9 @@ function renderHistoryCompact(m) {
       return `
       <div class="list-row" style="cursor:default;">
         <div class="member-photo" style="width:38px;height:38px;background:${meta.rowIconBg};color:${meta.rowIconColor};">${icon(meta.rowIconName, 17)}</div>
-        <div style="flex:1;min-width:0;">
+               <div style="flex:1;min-width:0;">
           <div class="list-row-name">${meta.typeLabel}</div>
-          <div class="list-row-meta">${fmtDateLong(new Date(e.iso))} &middot; ${e.recordedBy || 'Admin'}</div>
+          <div class="list-row-meta">${fmtDateLong(new Date(e.iso))} &middot; ${e.recordedBy || 'Admin'}${e.smsStatus === 'failed' ? ` &middot; <span style="color:var(--red-600);font-weight:600;" title="SMS notification failed to send">${icon('alertTri', 11)} SMS failed</span>` : ''}</div>
         </div>
         <div class="list-row-right">
           <div class="list-row-amount num" style="${meta.amtColor}">${meta.sign}${GHSshort(e.amount || 0)}</div>
@@ -1636,7 +1677,7 @@ function renderHistoryExpanded(m) {
           <td data-label="Type">${meta.typeLabel}</td>
           <td data-label="Amount" class="num" style="${meta.amtColor}">${meta.sign}${GHSshort(e.amount || 0)}</td>
           <td data-label="Status">${meta.badge}</td>
-          <td data-label="Recorded By">${e.recordedBy || 'Admin'}</td>
+                 <td data-label="Recorded By">${e.recordedBy || 'Admin'}${e.smsStatus === 'failed' ? ` <span class="badge badge-red" title="SMS notification failed to send">${icon('alertTri', 11)} SMS failed</span>` : ''}</td>
         </tr>`;
       }).join('')}
       </tbody>
@@ -2217,11 +2258,10 @@ async function confirmPayment(memberId, iso) {
   const note = document.getElementById('pay-note').value.trim();
   const originalLabel = btn.innerHTML;
   btn.innerHTML = `${icon('checkCircle', 15)} Saving...`;
-
-  const { error } = await supabaseClient.from('payments').upsert(
+  const { data: paymentRow, error } = await supabaseClient.from('payments').upsert(
     { member_id: m.id, payment_date: iso, amount, status: action, note, recorded_by: getCurrentUserName() },
     { onConflict: 'member_id,payment_date' }
-  );
+  ).select('id').single();
 
   if (error) {
     console.error(error);
@@ -2231,7 +2271,7 @@ async function confirmPayment(memberId, iso) {
     return;
   }
   if (action === 'paid') {
-    SMS.notifyDeposit(m, amount, iso, note).catch(err => console.error('SMS deposit notify failed:', err));
+    trackSmsResult('payments', paymentRow?.id, SMS.notifyDeposit(m, amount, iso, note), `${m.name} was not notified by SMS — the deposit was still saved.`);
   }
   closeModal();
   await refreshSupabaseData();
@@ -2255,7 +2295,7 @@ async function applyBulkAction(memberId, action) {
     member_id: m.id, payment_date: iso, amount: action === 'paid' ? m.dailySavings : 0,
     status: action, note: 'Bulk update', recorded_by: getCurrentUserName()
   }));
-  const { error } = await supabaseClient.from('payments').upsert(rows, { onConflict: 'member_id,payment_date' });
+  const { data: insertedRows, error } = await supabaseClient.from('payments').upsert(rows, { onConflict: 'member_id,payment_date' }).select('id');
 
   if (error) {
     console.error(error);
@@ -2265,7 +2305,8 @@ async function applyBulkAction(memberId, action) {
   }
   if (action === 'paid') {
     const deposits = dates.map(iso => ({ date: iso, amount: m.dailySavings }));
-    SMS.notifyBulkDeposits(m, deposits).catch(err => console.error('SMS bulk notify failed:', err));
+    const rowIds = (insertedRows || []).map(r => r.id);
+    trackSmsResultBulk('payments', rowIds, SMS.notifyBulkDeposits(m, deposits), `${m.name} was not notified by SMS for the bulk update — the payments were still saved.`);
   }
   state.calSelecting = false;
   state.calSelectedDates = new Set();
@@ -2322,10 +2363,9 @@ async function confirmWithdraw(memberId) {
   const note = document.getElementById('withdraw-note').value.trim();
   const originalLabel = btn.innerHTML;
   btn.innerHTML = `${icon('minusCircle', 15)} Withdrawing...`;
-
-  const { error } = await supabaseClient.from('withdrawals').insert({
+  const { data: withdrawalRow, error } = await supabaseClient.from('withdrawals').insert({
     member_id: m.id, amount, withdrawal_date: isoDate(TODAY), note, recorded_by: getCurrentUserName()
-  });
+  }).select('id').single();
 
   if (error) {
     console.error(error);
@@ -2334,7 +2374,7 @@ async function confirmWithdraw(memberId) {
     btn.innerHTML = originalLabel;
     return;
   }
-  SMS.notifyWithdrawal(m, amount, isoDate(TODAY), note).catch(err => console.error('SMS withdrawal notify failed:', err));
+  trackSmsResult('withdrawals', withdrawalRow?.id, SMS.notifyWithdrawal(m, amount, isoDate(TODAY), note), `${m.name} was not notified by SMS about this withdrawal — it was still recorded.`);
   closeModal();
   await refreshSupabaseData();
   toast('success', 'minusCircle', `${GHSshort(amount)} withdrawn from ${m.name}'s savings.`);
@@ -2639,6 +2679,11 @@ document.addEventListener('input', function(e) {
     e.target.classList.remove('error');
     return;
   }
+  if (e.target.id === 'f-card') {
+    document.getElementById('err-card')?.classList.add('hidden');
+    e.target.classList.remove('error');
+    return;
+  }
 });
 
 function renderMembersListOnly() {
@@ -2663,7 +2708,6 @@ function closeSidebarMobile() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-backdrop').classList.remove('active');
 }
-
 document.addEventListener('submit', async function(e) {
   if (e.target.id === 'add-member-form') {
     e.preventDefault();
@@ -2672,21 +2716,29 @@ document.addEventListener('submit', async function(e) {
 
     const name = document.getElementById('f-name').value.trim();
     const phone = document.getElementById('f-phone').value.trim();
+    const card = document.getElementById('f-card').value.trim();
     let ok = true;
+
     document.getElementById('err-name').classList.toggle('hidden', !!name);
-    if (!name) ok = false;
     document.getElementById('f-name').classList.toggle('error', !name);
+    if (!name) ok = false;
+
     const phoneValid = /^[0-9+\s]{7,15}$/.test(phone);
     document.getElementById('err-phone').classList.toggle('hidden', phoneValid);
     document.getElementById('f-phone').classList.toggle('error', !phoneValid);
     if (!phoneValid) ok = false;
+
+    const cardTaken = !!card && MEMBERS.some(m => m.cardNumber.trim().toLowerCase() === card.toLowerCase());
+    document.getElementById('err-card').classList.toggle('hidden', !cardTaken);
+    document.getElementById('f-card').classList.toggle('error', cardTaken);
+    if (!card || cardTaken) ok = false;
+
     if (!ok) { toast('error', 'xCircle', 'Please fix the highlighted fields.'); return; }
 
     submitBtn.disabled = true;
     const originalLabel = submitBtn.innerHTML;
     submitBtn.innerHTML = `${icon('checkCircle', 16)} Registering...`;
 
-    const card = document.getElementById('f-card').value.trim();
     const address = document.getElementById('f-address').value.trim() || 'Not provided';
     const daily = parseFloat(document.getElementById('f-daily').value) || 20;
     const joined = new Date(document.getElementById('f-joined').value || isoDate(TODAY));
@@ -2694,9 +2746,15 @@ document.addEventListener('submit', async function(e) {
     const { error } = await supabaseClient.from('members').insert({ name, card_number: card, phone, address, date_joined: isoDate(joined), daily_savings: daily, status: 'Active' });
     if (error) {
       console.error(error);
-      toast('error', 'alertTri', error.message || 'Could not register member.');
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalLabel;
+      if (error.code === '23505') {
+        document.getElementById('err-card').classList.remove('hidden');
+        document.getElementById('f-card').classList.add('error');
+        toast('error', 'xCircle', 'That card number is already in use.');
+      } else {
+        toast('error', 'alertTri', error.message || 'Could not register member.');
+      }
       return;
     }
     await refreshSupabaseData();
