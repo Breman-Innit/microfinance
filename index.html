@@ -1116,7 +1116,7 @@ const state = {
   selectedMemberId: null,
   membersViewMode: 'grid',
   memberSearch: '',
-  memberSort: 'name',
+  memberSort: 'id',
   profileCalMonth: TODAY.getMonth(),
   profileCalYear: TODAY.getFullYear(),
   historyFilter: 'all',
@@ -1293,6 +1293,7 @@ function filteredMembers() {
   let list = MEMBERS.slice();
   const q = state.memberSearch.trim().toLowerCase();
   if (q) list = list.filter(m => m.name.toLowerCase().includes(q) || m.cardNumber.toLowerCase().includes(q));
+  if (state.memberSort === 'id') list.sort((a, b) => a.id - b.id);
   if (state.memberSort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
   if (state.memberSort === 'savings') list.sort((a, b) => b.totalSavings - a.totalSavings);
   if (state.memberSort === 'recent') list.sort((a, b) => b.dateJoined - a.dateJoined);
@@ -1321,6 +1322,7 @@ function pageMembers() {
     <div class="search-box">${icon('search', 16)}<input id="member-search-input" placeholder="Search by name or card number..." value="${state.memberSearch}"/></div>
     <div class="select-box">
       <select id="member-sort-select">
+        <option value="id" ${state.memberSort === 'id' ? 'selected' : ''}>Sort: Member ID</option>
         <option value="name" ${state.memberSort === 'name' ? 'selected' : ''}>Sort: Name (A-Z)</option>
         <option value="savings" ${state.memberSort === 'savings' ? 'selected' : ''}>Sort: Highest Savings</option>
         <option value="recent" ${state.memberSort === 'recent' ? 'selected' : ''}>Sort: Recently Joined</option>
@@ -1568,7 +1570,7 @@ function renderCalendarCard(m) {
       body = `<div class="cal-daynum">${day.getDate()}</div><div class="cal-status-icon">${icon(statusIcon, 14)}</div><div class="cal-status-text">${statusText}</div>`;
     }
      if (isToday) cls += ' today';
-    if (state.calSelecting && !beforeJoin && !isFuture) {
+    if (state.calSelecting && !beforeJoin) {
       cls += ' selectable-mode';
       if (state.calSelectedDates.has(iso)) cls += ' selected';
       body += `<div class="cal-select-check">${icon('checkCircle', 11, 2.4)}</div>`;
@@ -2303,10 +2305,13 @@ async function applyBulkAction(memberId, action) {
   if (bulkButtons.length && bulkButtons[0].disabled) return; // guards against double-click
   bulkButtons.forEach(b => { b.disabled = true; });
 
-  const m = getMember(memberId),
-    dates = Array.from(state.calSelectedDates).filter(iso => iso <= isoDate(TODAY));
+  const m = getMember(memberId);
+  let dates = Array.from(state.calSelectedDates);
+  const skippedFutureCount = action === 'missed' ? dates.filter(iso => iso > isoDate(TODAY)).length : 0;
+  if (action === 'missed') dates = dates.filter(iso => iso <= isoDate(TODAY));
   if (!m || dates.length === 0) {
     bulkButtons.forEach(b => { b.disabled = false; });
+    if (skippedFutureCount > 0) toast('error', 'alertTri', 'Future dates cannot be marked as missed.');
     return;
   }
 
@@ -2330,7 +2335,10 @@ async function applyBulkAction(memberId, action) {
   state.calSelecting = false;
   state.calSelectedDates = new Set();
   await refreshSupabaseData();
-  toast('success', 'checkCircle', `${dates.length} day${dates.length === 1 ? '' : 's'} marked as ${action}.`);
+  const msg = skippedFutureCount > 0
+    ? `${dates.length} day${dates.length === 1 ? '' : 's'} marked as ${action}. ${skippedFutureCount} future date${skippedFutureCount === 1 ? '' : 's'} skipped (cannot mark future dates missed).`
+    : `${dates.length} day${dates.length === 1 ? '' : 's'} marked as ${action}.`;
+  toast('success', 'checkCircle', msg);
   go('member-profile', { selectedMemberId: memberId });
 }
 
@@ -2607,8 +2615,7 @@ document.addEventListener('click', async function(e) {
     if (calCell.hasAttribute('data-before-join')) return;
     const memberId = Number(calCell.getAttribute('data-member'));
     const iso = calCell.getAttribute('data-cal-date');
-    if (state.calSelecting) {
-      if (iso > isoDate(TODAY)) return; // block future-date selection in bulk mode
+     if (state.calSelecting) {
       if (state.calSelectedDates.has(iso)) state.calSelectedDates.delete(iso);
       else state.calSelectedDates.add(iso);
       document.getElementById('calendar-card').innerHTML = renderCalendarCard(getMember(memberId));
