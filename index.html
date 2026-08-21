@@ -2159,6 +2159,85 @@ async function confirmDeleteMember(memberId) {
   go('members');
 }
 
+function openEditMemberModal(memberId) {
+  const m = getMember(memberId);
+  if (!m) return;
+  openModal(`
+    <div class="modal-head"><h3>Edit Member Details</h3><button class="modal-close" id="modal-close-btn">${icon('x', 15)}</button></div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Full Name <span class="req">*</span></label>
+        <input type="text" id="edit-name" value="${m.name}" placeholder="e.g. Kwame Mensah"/>
+        <div class="error-msg hidden" id="err-edit-name">${icon('alertTri', 12)} Full name is required</div>
+      </div>
+      <div class="field">
+        <label>Phone Number <span class="req">*</span></label>
+        <input type="tel" id="edit-phone" value="${m.phone}" placeholder="024 000 0000"/>
+        <div class="error-msg hidden" id="err-edit-phone">${icon('alertTri', 12)} Enter a valid phone number</div>
+      </div>
+      <div class="field">
+        <label>Address</label>
+        <input type="text" id="edit-address" value="${m.address}" placeholder="e.g. Adabraka, Accra"/>
+      </div>
+      <div class="readonly-row" style="background:var(--blue-50);padding:8px 12px;border-radius:var(--radius-sm);border-bottom:none;">
+        <span style="color:var(--blue-500);font-size:12.5px;">${icon('info', 13)} SMS deposit/withdrawal notifications will be sent to the updated phone number going forward.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="confirm-edit-member-btn" data-member="${m.id}">${icon('checkCircle', 15)} Save Changes</button>
+    </div>
+  `);
+}
+
+async function confirmEditMember(memberId) {
+  const btn = document.getElementById('confirm-edit-member-btn');
+  if (!btn || btn.disabled) return; // guards against double-click / double-submit
+
+  const m = getMember(memberId);
+  if (!m) return;
+
+  const nameInput = document.getElementById('edit-name');
+  const phoneInput = document.getElementById('edit-phone');
+  const addressInput = document.getElementById('edit-address');
+  const name = nameInput.value.trim();
+  const phone = phoneInput.value.trim();
+  const address = addressInput.value.trim() || 'Not provided';
+
+  let ok = true;
+  const nameErr = document.getElementById('err-edit-name');
+  nameErr.classList.toggle('hidden', !!name);
+  nameInput.classList.toggle('error', !name);
+  if (!name) ok = false;
+
+  const phoneValid = /^[0-9+\s]{7,15}$/.test(phone);
+  const phoneErr = document.getElementById('err-edit-phone');
+  phoneErr.classList.toggle('hidden', phoneValid);
+  phoneInput.classList.toggle('error', !phoneValid);
+  if (!phoneValid) ok = false;
+
+  if (!ok) return;
+
+  btn.disabled = true;
+  const originalLabel = btn.innerHTML;
+  btn.innerHTML = `${icon('checkCircle', 15)} Saving...`;
+
+  const { error } = await supabaseClient.from('members').update({ name, phone, address }).eq('id', m.id);
+
+  if (error) {
+    console.error(error);
+    toast('error', 'alertTri', error.message || 'Could not update member details.');
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+    return;
+  }
+
+  closeModal();
+  await refreshSupabaseData();
+  toast('success', 'checkCircle', 'Member details updated successfully.');
+  go('member-profile', { selectedMemberId: memberId });
+}
+
 function openPaymentModal(memberId, dateIso) {
   const m = getMember(memberId);
   const date = dateIso ? new Date(dateIso) : TODAY;
@@ -2676,8 +2755,11 @@ document.addEventListener('click', async function(e) {
   if (repChip) { state.reportRange = repChip.getAttribute('data-report-range');
     render(); return; }
 
-  // edit member (placeholder toast - will be implemented)
-  if (e.target.closest('#edit-member-btn')) { toast('success', 'info', 'Editing member details is available in the full release.'); return; }
+  // edit member
+  const editMemberBtn = e.target.closest('#edit-member-btn');
+  if (editMemberBtn) { openEditMemberModal(state.selectedMemberId); return; }
+  const confirmEditBtn = e.target.closest('#confirm-edit-member-btn');
+  if (confirmEditBtn) { confirmEditMember(Number(confirmEditBtn.getAttribute('data-member'))); return; }
 });
 
 document.addEventListener('input', function(e) {
