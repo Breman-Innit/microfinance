@@ -646,8 +646,9 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
     <button class="nav-item" data-nav="members"></button>
     <button class="nav-item" data-nav="today"></button>
     <button class="nav-item" data-nav="reports"></button>
-    <div class="nav-group-label">Account</div>
-    <button class="nav-item" data-nav="notifications-page"></button>
+   <div class="nav-group-label">Account</div>
+<button class="nav-item" data-nav="notifications-page"></button>
+<a class="nav-item" id="sms-credits-link" href="https://sms.sasusync.com/portal#dashboard" target="_blank" rel="noopener noreferrer"></a>
     <div class="sidebar-footer">
       <div class="sidebar-user" id="sidebar-user-slot"></div>
       <button class="logout-btn" id="logout-btn"></button>
@@ -1155,6 +1156,8 @@ function renderChrome() {
     btn.innerHTML = `${icon(NAV_LABELS[key].icon, 18)}<span>${NAV_LABELS[key].label}</span>`;
     btn.classList.toggle('active', state.route === key || (key === 'members' && (state.route === 'member-profile' || state.route === 'add-member')));
   });
+
+    document.getElementById('sms-credits-link').innerHTML = `${icon('coins', 18)}<span>Buy SMS Credits</span>`;
 
    const userName = esc(getCurrentUserName());
   document.getElementById('sidebar-user-slot').innerHTML = `${avatar(userName, 36)}<div><div class="sidebar-user-name">${userName}</div><div class="sidebar-user-role">Administrator</div></div>`;
