@@ -648,6 +648,8 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
     <button class="nav-item" data-nav="reports"></button>
    <div class="nav-group-label">Account</div>
 <button class="nav-item" data-nav="notifications-page"></button>
+<div class="nav-item" id="sms-credits-balance" style="cursor:default;"></div>
+<a class="nav-item" id="sms-credits-link" href="https://sms.sasusync.com/portal#dashboard" target="_blank" rel="noopener noreferrer"></a>
 <a class="nav-item" id="sms-credits-link" href="https://sms.sasusync.com/portal#dashboard" target="_blank" rel="noopener noreferrer"></a>
     <div class="sidebar-footer">
       <div class="sidebar-user" id="sidebar-user-slot"></div>
@@ -879,6 +881,8 @@ const SMS = {
 
     isConfigured() {
         return typeof supabaseClient !== 'undefined' && supabaseClient !== null;
+
+        
     },
 
     async send(recipients, message) {
@@ -954,6 +958,51 @@ const SMS = {
         return await this.send(member.phone, message);
     }
 };
+function renderSmsCreditsBalance() {
+  const el = document.getElementById('sms-credits-balance');
+  if (!el) return;
+
+  if (SMS_BALANCE_CACHE && typeof SMS_BALANCE_CACHE.sms_credits === 'number') {
+    el.innerHTML = `${icon('wallet', 18)}<span>${SMS_BALANCE_CACHE.sms_credits} SMS Credits Left</span>`;
+  } else {
+    el.innerHTML = `${icon('wallet', 18)}<span>Checking credits...</span>`;
+  }
+
+  fetchSmsBalance().then(data => {
+    const el2 = document.getElementById('sms-credits-balance');
+    if (!el2) return;
+    if (data && typeof data.sms_credits === 'number') {
+      el2.innerHTML = `${icon('wallet', 18)}<span>${data.sms_credits} SMS Credits Left</span>`;
+    } else {
+      el2.innerHTML = `${icon('wallet', 18)}<span>Credits unavailable</span>`;
+    }
+  });
+}
+
+/* ---------- SMS balance ---------- */
+let SMS_BALANCE_CACHE = null;
+let SMS_BALANCE_FETCHED_AT = 0;
+
+async function fetchSmsBalance(force = false) {
+  const FIVE_MINUTES = 5 * 60 * 1000;
+  if (!force && SMS_BALANCE_CACHE && (Date.now() - SMS_BALANCE_FETCHED_AT < FIVE_MINUTES)) {
+    return SMS_BALANCE_CACHE;
+  }
+  try {
+    const { data, error } = await supabaseClient.functions.invoke('get-sms-balance');
+    if (error || !data || data.error) {
+      console.error('SMS balance fetch failed:', error || data?.error);
+      return null;
+    }
+    SMS_BALANCE_CACHE = data;
+    SMS_BALANCE_FETCHED_AT = Date.now();
+    return data;
+  } catch (err) {
+    console.error('SMS balance fetch error:', err);
+    return null;
+  }
+}
+
 
 /* ---------- SMS delivery result tracking ---------- */
 function trackSmsResult(table, rowId, smsPromise, failureMessage) {
@@ -1158,6 +1207,9 @@ function renderChrome() {
   });
 
     document.getElementById('sms-credits-link').innerHTML = `${icon('coins', 18)}<span>Buy SMS Credits</span>`;
+
+        document.getElementById('sms-credits-link').innerHTML = `${icon('coins', 18)}<span>Buy SMS Credits</span>`;
+    renderSmsCreditsBalance();
 
    const userName = esc(getCurrentUserName());
   document.getElementById('sidebar-user-slot').innerHTML = `${avatar(userName, 36)}<div><div class="sidebar-user-name">${userName}</div><div class="sidebar-user-role">Administrator</div></div>`;
