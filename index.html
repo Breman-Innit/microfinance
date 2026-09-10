@@ -1515,12 +1515,14 @@ function getMember(id) { return MEMBERS.find(m => m.id === Number(id)); }
 
 
 function nextMemberNumber() {
-  let max = 0;
+  const used = new Set();
   MEMBERS.forEach(m => {
     const n = parseInt(m.cardNumber, 10);
-    if (!Number.isNaN(n) && String(n) === m.cardNumber.trim() && n > max) max = n;
+    if (!Number.isNaN(n) && String(n) === m.cardNumber.trim()) used.add(n);
   });
-  return max + 1;
+  let candidate = 1;
+  while (used.has(candidate)) candidate++;
+  return candidate;
 }
 function pageMemberProfile(id) {
   const m = getMember(id);
