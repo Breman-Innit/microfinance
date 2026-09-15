@@ -5,7 +5,7 @@ const SMS_API_KEY = Deno.env.get("SASUSYNC_API_KEY") || "";
 const SMS_SENDER_ID = Deno.env.get("SASUSYNC_SENDER_ID") || "LimolMicro";
 const SMS_ENDPOINT = Deno.env.get("SASUSYNC_ENDPOINT") || "https://sms.sasusync.com/api/v1/send";
 
-// ⚠️ TEST MODE: Set to false when you have funds and want real SMS
+//  TEST MODE: Set to false when you have funds and want real SMS
 const TEST_MODE = false;
 
 // CORS headers
@@ -71,8 +71,8 @@ Deno.serve(async (req) => {
 
     // TEST MODE: Skip actual SMS sending
     if (TEST_MODE) {
-      console.log('🧪 TEST MODE: SMS would be sent to:', formattedRecipients);
-      console.log('📝 Message:', message);
+      console.log(' TEST MODE: SMS would be sent to:', formattedRecipients);
+      console.log(' Message:', message);
       return new Response(JSON.stringify({
         success: true,
         test_mode: true,
@@ -91,12 +91,12 @@ Deno.serve(async (req) => {
       message: message,
     };
 
-    console.log('📤 Sending SMS to:', formattedRecipients);
-    console.log('📝 Message:', message);
+    console.log(' Sending SMS to:', formattedRecipients);
+    console.log(' Message:', message);
 
     // Check if API key is set
     if (!SMS_API_KEY || SMS_API_KEY === "" || SMS_API_KEY.length < 10) {
-      console.error('❌ API key is missing or too short:', SMS_API_KEY);
+      console.error(' API key is missing or too short:', SMS_API_KEY);
       return new Response(JSON.stringify({
         error: "SMS API key not configured or invalid",
         message: "Please set a valid SASUSYNC_API_KEY in Supabase secrets",
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('❌ SMS API error:', data);
+      console.error(' SMS API error:', data);
       return new Response(JSON.stringify({
         error: data.detail || data.message || 'SMS send failed',
         details: data,
@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log('✅ SMS sent successfully:', data);
+    console.log(' SMS sent successfully:', data);
     return new Response(JSON.stringify({
       success: true,
       data: data,
@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('💥 Edge Function error:', error);
+    console.error(' Edge Function error:', error);
     return new Response(JSON.stringify({
       error: error.message || 'Internal server error',
     }), {
