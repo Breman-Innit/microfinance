@@ -614,7 +614,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
       <div class="sub">Sign in to manage your savings operations.</div>
       <form id="login-form">
         <div class="field">
-          <label>Email or Username</label>
+          <label>Email</label>
           <input type="text" id="login-email" value="" placeholder="email" required />
         </div>
         <div class="field" style="margin-bottom:14px;">
@@ -1341,6 +1341,18 @@ function pageDashboard() {
   `;
 }
 
+
+function compareByCardNumber(a, b) {
+  const aStr = (a.cardNumber || '').trim();
+  const bStr = (b.cardNumber || '').trim();
+  const aNum = /^\d+$/.test(aStr) ? parseInt(aStr, 10) : null;
+  const bNum = /^\d+$/.test(bStr) ? parseInt(bStr, 10) : null;
+
+  if (aNum !== null && bNum !== null) return aNum - bNum || a.id - b.id; // numeric order
+  if (aNum !== null) return -1; // numeric cards first
+  if (bNum !== null) return 1;
+  return aStr.localeCompare(bStr, undefined, { numeric: true }) || a.id - b.id; // non-numeric after
+}
 /* =========================================================================
    PAGE: MEMBERS
    ========================================================================= */
@@ -1348,7 +1360,7 @@ function filteredMembers() {
   let list = MEMBERS.slice();
   const q = state.memberSearch.trim().toLowerCase();
   if (q) list = list.filter(m => m.name.toLowerCase().includes(q) || m.cardNumber.toLowerCase().includes(q));
-  if (state.memberSort === 'id') list.sort((a, b) => a.id - b.id);
+  if (state.memberSort === 'id') list.sort(compareByCardNumber);
   if (state.memberSort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
   if (state.memberSort === 'savings') list.sort((a, b) => b.totalSavings - a.totalSavings);
   if (state.memberSort === 'recent') list.sort((a, b) => b.dateJoined - a.dateJoined);
@@ -2944,14 +2956,11 @@ document.addEventListener('submit', async function(e) {
 
   if (e.target.id === 'login-form') {
     e.preventDefault();
-    console.log(' Login form submitted');
+  
 
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = e.target.querySelector('button[type="submit"]');
-
-    console.log(' Email:', email);
-    console.log(' Password length:', password.length);
 
     btn.disabled = true;
     btn.textContent = 'Signing in…';
@@ -2960,7 +2969,7 @@ document.addEventListener('submit', async function(e) {
       console.log(' Attempting to sign in with Supabase...');
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-      console.log(' Supabase response:', { data, error });
+      
 
       btn.disabled = false;
       btn.textContent = 'Sign In';
