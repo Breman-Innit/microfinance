@@ -625,7 +625,7 @@ tbody tr.clickable:hover{background:var(--gray-25);cursor:pointer;}
           </div>
         </div>
         <div class="remember-row">
-          <label class="checkbox-row"><input type="checkbox" checked/> Remember me</label>
+          <label class="checkbox-row"><input type="checkbox" id="remember-me" checked/> Remember me</label>
           <button type="button" class="forgot-link" id="forgot-password-link">Forgot password?</button>
         </div>
         <button type="submit" class="btn btn-primary btn-block" style="padding:12px;">Sign In</button>
@@ -2975,6 +2975,15 @@ document.addEventListener('submit', async function(e) {
 
       CURRENT_SESSION_USER = data?.user || null;
 
+      try {
+  if (document.getElementById('remember-me').checked) {
+    localStorage.removeItem('limol-session-only');
+  } else {
+    localStorage.setItem('limol-session-only', '1');
+    sessionStorage.setItem('limol-tab-alive', '1');
+  }
+} catch (e) { /* storage unavailable, ignore */ }
+
       console.log(' Loading data from Supabase...');
       if (!await refreshSupabaseData()) {
         console.error(' Failed to load data, logging out...');
@@ -3085,6 +3094,14 @@ supabaseClient.auth.onAuthStateChange((event) => {
 });
 /* ---------- init ---------- */
 (async function initSupabase() {
+  try {
+  const sessionOnly = localStorage.getItem('limol-session-only') === '1';
+  const tabAlive = sessionStorage.getItem('limol-tab-alive') === '1';
+  if (sessionOnly && !tabAlive) {
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem('limol-session-only');
+  }
+} catch (e) { /* storage unavailable, ignore */ }
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
