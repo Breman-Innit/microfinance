@@ -801,6 +801,85 @@ function esc(str) {
     .replace(/'/g, '&#39;');
 }
 
+/* ---------- dashboard count-up + progress animations ---------- */
+let PLAY_DASH_ANIM = true;
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+const COUNT_FORMATS = {
+  ghs: GHS,
+  ghsshort: GHSshort,
+  int: v => String(Math.round(v)),
+  pct: v => Math.round(v) + '%'
+};
+
+function countAttrs(value, fmt) {
+  return `data-count="${Number(value) || 0}" data-fmt="${fmt}"`;
+}
+
+function runDashboardAnimations() {
+  if (prefersReducedMotion()) return;
+  const root = document.getElementById('content');
+  const DURATION = 1100;
+
+  root.querySelectorAll('[data-count]').forEach(el => {
+    const target = Number(el.dataset.count);
+    const format = COUNT_FORMATS[el.dataset.fmt];
+    if (!format || !Number.isFinite(target)) return;
+    const finalText = el.textContent;
+    const start = performance.now();
+    el.textContent = format(0);
+    function frame(now) {
+      if (!el.isConnected) return;
+      const t = Math.min(1, (now - start) / DURATION);
+      if (t < 1) {
+        el.textContent = format(target * (1 - Math.pow(1 - t, 3)));
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = finalText;
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+
+  root.querySelectorAll('.sa-balance, .sa-break-val, .stat-value').forEach(el => {
+    if (el.querySelector('[data-count]')) return;
+    const finalText = el.textContent;
+    const match = finalText.match(/[\d,]+(\.\d+)?/);
+    if (!match) return;
+    const target = parseFloat(match[0].replace(/,/g, ''));
+    if (!Number.isFinite(target)) return;
+    const decimals = match[1] ? match[1].length - 1 : 0;
+    const show = v => finalText.replace(match[0], v.toLocaleString('en-GH', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }));
+    const start = performance.now();
+    el.textContent = show(0);
+    function frame(now) {
+      if (!el.isConnected) return;
+      const t = Math.min(1, (now - start) / DURATION);
+      if (t < 1) {
+        el.textContent = show(target * (1 - Math.pow(1 - t, 3)));
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = finalText;
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+
+  root.querySelectorAll('.progress-fill, [data-fill-to]').forEach(bar => {
+    const width = bar.hasAttribute('data-fill-to')
+      ? Math.max(0, Math.min(100, Number(bar.dataset.fillTo) || 0)) + '%'
+      : bar.style.width;
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    bar.getBoundingClientRect();
+    bar.style.transition = 'width 1.2s cubic-bezier(.22,1,.36,1)';
+    bar.style.width = width;
+  });
+}
+
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -1191,6 +1270,7 @@ function go(route, opts = {}) {
   document.getElementById('notif-dropdown').classList.add('hidden');
   document.getElementById('user-dropdown').classList.add('hidden');
   window.scrollTo(0, 0);
+  PLAY_DASH_ANIM = (route === 'dashboard');
   render();
 }
 
@@ -1317,9 +1397,9 @@ function pageDashboard() {
     <div class="card card-pad">
       <h3 class="section-title">Today's Savings Collection</h3>
       <div class="stat-value num" style="font-size:30px;margin-top:10px;">${GHS(today)}</div>
-      <div class="progress-track" style="margin:16px 0 10px;"><div class="progress-fill" style="width:${pct}%;"></div></div>
+      <div class="progress-track" style="margin:16px 0 10px;"><div class="progress-fill" data-fill-to="${pct}" style="width:${pct}%;"></div></div>
       <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--gray-500);font-weight:600;margin-bottom:16px;">
-        <span>${pct}% collected</span><span>${paidTodayCount} / ${expected} members</span>
+        <span><span ${countAttrs(pct,'pct')}>${pct}%</span> collected</span><span>${paidTodayCount} / ${expected} members</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
         <div class="card" style="padding:10px;text-align:center;border-color:var(--gray-100);">
@@ -2665,6 +2745,10 @@ function render() {
       html = pageDashboard();
   }
   content.innerHTML = html;
+  if (PLAY_DASH_ANIM && state.route === 'dashboard') {
+    PLAY_DASH_ANIM = false;
+    runDashboardAnimations();
+  }
 }
 
 /* =========================================================================
