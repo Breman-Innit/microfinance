@@ -2092,6 +2092,20 @@ function openSettingsModal() {
     this.disabled = true;
     this.textContent = 'Saving...';
 
+    if (wantsPasswordChange) {
+  const { error: reauthErr } = await supabaseClient.auth.signInWithPassword({
+    email: getCurrentUserEmail(),
+    password: currentPw
+  });
+  if (reauthErr) {
+    this.disabled = false;
+    this.innerHTML = `${icon('checkCircle', 15)} Save Settings`;
+    errorEl.classList.remove('hidden');
+    errorText.textContent = 'Current password is incorrect.';
+    return;
+  }
+}
+
     const updatePayload = { data: { name: newName } };
     if (wantsPasswordChange) updatePayload.password = newPw;
 
@@ -3009,6 +3023,66 @@ if (loginForm) {
   console.error(' Login form NOT found! Check your HTML.');
 }
 
+/* ---------- password recovery (reset link) ---------- */
+function openRecoveryModal() {
+  openModal(`
+    <div class="modal-head"><h3>Set New Password</h3></div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--gray-500);margin-bottom:16px;">Choose a new password for your account.</p>
+      <div class="field">
+        <label>New Password</label>
+        <input type="password" id="recovery-new-pw" placeholder="At least 6 characters"/>
+      </div>
+      <div class="field">
+        <label>Confirm New Password</label>
+        <input type="password" id="recovery-confirm-pw" placeholder="Confirm new password"/>
+      </div>
+      <div class="error-msg hidden" id="recovery-error">${icon('alertTri', 12)} <span id="recovery-error-text"></span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="recovery-save-btn">${icon('checkCircle', 15)} Save Password</button>
+    </div>
+  `);
+
+  document.getElementById('recovery-save-btn').addEventListener('click', async function() {
+    const newPw = document.getElementById('recovery-new-pw').value;
+    const confirmPw = document.getElementById('recovery-confirm-pw').value;
+    const errorEl = document.getElementById('recovery-error');
+    const errorText = document.getElementById('recovery-error-text');
+    errorEl.classList.add('hidden');
+
+    if (newPw.length < 6) {
+      errorEl.classList.remove('hidden');
+      errorText.textContent = 'Password must be at least 6 characters.';
+      return;
+    }
+    if (newPw !== confirmPw) {
+      errorEl.classList.remove('hidden');
+      errorText.textContent = 'Passwords do not match.';
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = 'Saving...';
+    const { error } = await supabaseClient.auth.updateUser({ password: newPw });
+    this.disabled = false;
+    this.innerHTML = `${icon('checkCircle', 15)} Save Password`;
+
+    if (error) {
+      errorEl.classList.remove('hidden');
+      errorText.textContent = error.message || 'Could not update password.';
+      return;
+    }
+    closeModal();
+    toast('success', 'checkCircle', 'Password updated successfully!');
+  });
+}
+
+supabaseClient.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    setTimeout(openRecoveryModal, 0);
+  }
+});
 /* ---------- init ---------- */
 (async function initSupabase() {
   try {

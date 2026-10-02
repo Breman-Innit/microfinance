@@ -1,3 +1,5 @@
+import { createClient } from "npm:@supabase/supabase-js@2";
+
 const SMS_API_KEY = Deno.env.get("SASUSYNC_API_KEY") || "";
 const BALANCE_ENDPOINT = "https://sms.sasusync.com/otp/balance";
 
@@ -14,6 +16,30 @@ Deno.serve(async (req) => {
   }
 
   try {
+
+    // --- Caller check: must be a logged-in, listed admin ---
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Not logged in" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: isAdmin, error: adminErr } = await supabase.rpc("is_admin");
+    if (adminErr || isAdmin !== true) {
+      return new Response(JSON.stringify({ error: "Not authorized" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     if (!SMS_API_KEY || SMS_API_KEY.length < 10) {
       return new Response(JSON.stringify({ error: "SMS API key not configured" }), {
         status: 500,
