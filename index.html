@@ -2930,53 +2930,53 @@ document.addEventListener('submit', async function(e) {
 
   if (e.target.id === 'login-form') {
     e.preventDefault();
-    console.log('🔐 Login form submitted');
+    console.log(' Login form submitted');
 
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = e.target.querySelector('button[type="submit"]');
 
-    console.log('📧 Email:', email);
-    console.log('🔑 Password length:', password.length);
+    console.log(' Email:', email);
+    console.log(' Password length:', password.length);
 
     btn.disabled = true;
     btn.textContent = 'Signing in…';
 
     try {
-      console.log('🔄 Attempting to sign in with Supabase...');
+      console.log(' Attempting to sign in with Supabase...');
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-      console.log('📦 Supabase response:', { data, error });
+      console.log(' Supabase response:', { data, error });
 
       btn.disabled = false;
       btn.textContent = 'Sign In';
 
       if (error) {
-        console.error('❌ Login error:', error);
+        console.error(' Login error:', error);
         toast('error', 'xCircle', error.message || 'Sign in failed.');
         return;
       }
 
-      console.log('✅ Login successful! User:', data?.user);
+      console.log(' Login successful! User:', data?.user);
 
       CURRENT_SESSION_USER = data?.user || null;
 
-      console.log('🔄 Loading data from Supabase...');
+      console.log(' Loading data from Supabase...');
       if (!await refreshSupabaseData()) {
-        console.error('❌ Failed to load data, logging out...');
+        console.error(' Failed to load data, logging out...');
         await supabaseClient.auth.signOut();
         CURRENT_SESSION_USER = null;
         return;
       }
 
-      console.log('✅ Data loaded successfully!');
+      console.log(' Data loaded successfully!');
       document.getElementById('login-view').style.display = 'none';
       document.getElementById('app-shell').classList.add('active');
-      console.log('🚀 Navigating to dashboard...');
+      console.log(' Navigating to dashboard...');
       go('dashboard');
 
     } catch (err) {
-      console.error('💥 Unexpected error during login:', err);
+      console.error(' Unexpected error during login:', err);
       btn.disabled = false;
       btn.textContent = 'Sign In';
       toast('error', 'alertTri', 'An unexpected error occurred. Please try again.');
@@ -2999,14 +2999,14 @@ document.getElementById('login-mobile-logo-wrap').innerHTML = `<img src="${LOGO_
 document.getElementById('login-security-note').innerHTML = `${icon('shieldCheck', 15)} Secured admin access · Limol's Microfinance`;
 
 /* Debug: Check if login form exists */
-console.log('🔍 Checking login form...');
+console.log(' Checking login form...');
 const loginForm = document.getElementById('login-form');
-console.log('📋 Login form element:', loginForm);
+console.log(' Login form element:', loginForm);
 
 if (loginForm) {
-  console.log('✅ Login form found!');
+  console.log(' Login form found!');
 } else {
-  console.error('❌ Login form NOT found! Check your HTML.');
+  console.error(' Login form NOT found! Check your HTML.');
 }
 
 /* ---------- init ---------- */
